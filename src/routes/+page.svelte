@@ -1,6 +1,7 @@
 <script lang="ts">
   import Chart from '$lib/components/Chart.svelte';
   import GithubIcon from '$lib/components/GitHubIcon.svelte';
+  import SlideStory from '$lib/components/SlideStory.svelte';
   import type { EChartsOption } from 'echarts';
   import type { GithubStats } from '$lib/server/github';
   import { onMount } from 'svelte';
@@ -24,6 +25,7 @@
 
   let loading = $state(false);
   let showSettings = $state(false);
+  let showStory = $state(false);
   let stats: GithubStats | undefined = $state(undefined);
   let token = $state('');
   let includePrivate = $state(true);
@@ -61,24 +63,6 @@
       ossIncludeOwn = cachedOssIncludeOwn === 'true';
     }
   });
-
-  // $effect(() => {
-  //   if (form?.stats) {
-  //     stats = form.stats;
-  //     showSettings = false;
-  //
-  //     // Defer localStorage writing to avoid blocking UI rendering
-  //     setTimeout(() => {
-  //       try {
-  //         // Clone to avoid potential proxy issues with Svelte 5 state
-  //         const statsClone = JSON.parse(JSON.stringify(form.stats));
-  //         localStorage.setItem('github_stats', JSON.stringify(statsClone));
-  //       } catch (e) {
-  //         console.error('Failed to save stats to localStorage', e);
-  //       }
-  //     }, 0);
-  //   }
-  // });
 
   function getHeatmapOptions(
     data: { date: string; count: number }[],
@@ -182,33 +166,42 @@
 </script>
 
 <div class="min-h-screen bg-gray-50 pb-10 font-sans text-gray-900">
-  <!-- Header -->
-  <header class="sticky top-0 z-10 mb-8 border-b border-gray-200 bg-white py-6 shadow-sm">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-4">
-      <div class="flex items-center gap-3">
-        <Github class="h-8 w-8" />
-        <h1 class="text-2xl font-bold tracking-tight">Annual Git Review</h1>
+    <!-- Header -->
+    <header class="sticky top-0 z-10 mb-8 border-b border-gray-200 bg-white py-6 shadow-sm">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4">
+        <div class="flex items-center gap-3">
+          <Github class="h-8 w-8" />
+          <h1 class="text-2xl font-bold tracking-tight">Annual Git Review</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          {#if stats}
+            <button
+              onclick={() => (showStory = true)}
+              class="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><path d="m9 16 6-6"/></svg>
+              Story Mode
+            </button>
+          {/if}
+          <a
+            href="https://github.com/elecmonkey/annual-git-review"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
+            aria-label="View on GitHub"
+          >
+            <GithubIcon class="h-6 w-6" />
+          </a>
+          <button
+            class="rounded-full p-2 transition-colors hover:bg-gray-100"
+            onclick={() => (showSettings = true)}
+            aria-label="Settings"
+          >
+            <Settings class="h-6 w-6 text-gray-600" />
+          </button>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <a
-          href="https://github.com/elecmonkey/annual-git-review"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
-          aria-label="View on GitHub"
-        >
-          <GithubIcon class="h-6 w-6" />
-        </a>
-        <button
-          class="rounded-full p-2 transition-colors hover:bg-gray-100"
-          onclick={() => (showSettings = true)}
-          aria-label="Settings"
-        >
-          <Settings class="h-6 w-6 text-gray-600" />
-        </button>
-      </div>
-    </div>
-  </header>
+    </header>
 
   <main class="mx-auto max-w-6xl px-4">
     {#if !stats}
@@ -593,5 +586,9 @@
         </div>
       </div>
     </div>
+  {/if}
+
+  {#if showStory && stats}
+    <SlideStory {stats} onClose={() => (showStory = false)} />
   {/if}
 </div>
