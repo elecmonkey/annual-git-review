@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-  import type { ActionData } from './$types';
   import Chart from '$lib/components/Chart.svelte';
   import GithubIcon from '$lib/components/GitHubIcon.svelte';
   import type { EChartsOption } from 'echarts';
+  import type { GithubStats } from '$lib/server/github';
+  import { onMount } from 'svelte';
   import {
     Loader2,
     Github,
@@ -19,11 +19,8 @@
     GitMerge,
     ExternalLink
   } from 'lucide-svelte';
-  import * as echarts from 'echarts';
-  import { onMount } from 'svelte';
-  import type { GithubStats } from '$lib/server/github';
 
-  let { form } = $props<{ form: ActionData }>();
+  // let { form } = $props<{ form: ActionData }>();
 
   let loading = $state(false);
   let showSettings = $state(false);
@@ -65,23 +62,23 @@
     }
   });
 
-  $effect(() => {
-    if (form?.stats) {
-      stats = form.stats;
-      showSettings = false;
-
-      // Defer localStorage writing to avoid blocking UI rendering
-      setTimeout(() => {
-        try {
-          // Clone to avoid potential proxy issues with Svelte 5 state
-          const statsClone = JSON.parse(JSON.stringify(form.stats));
-          localStorage.setItem('github_stats', JSON.stringify(statsClone));
-        } catch (e) {
-          console.error('Failed to save stats to localStorage', e);
-        }
-      }, 0);
-    }
-  });
+  // $effect(() => {
+  //   if (form?.stats) {
+  //     stats = form.stats;
+  //     showSettings = false;
+  //
+  //     // Defer localStorage writing to avoid blocking UI rendering
+  //     setTimeout(() => {
+  //       try {
+  //         // Clone to avoid potential proxy issues with Svelte 5 state
+  //         const statsClone = JSON.parse(JSON.stringify(form.stats));
+  //         localStorage.setItem('github_stats', JSON.stringify(statsClone));
+  //       } catch (e) {
+  //         console.error('Failed to save stats to localStorage', e);
+  //       }
+  //     }, 0);
+  //   }
+  // });
 
   function getHeatmapOptions(
     data: { date: string; count: number }[],
@@ -449,9 +446,10 @@
 
         <div class="p-6">
           <form
-            method="POST"
-            use:enhance={({ formData }) => {
+            onsubmit={async (e) => {
+              e.preventDefault();
               loading = true;
+              const formData = new FormData(e.currentTarget as HTMLFormElement);
               const tokenValue = formData.get('token')?.toString();
               if (tokenValue) {
                 localStorage.setItem('github_token', tokenValue);
@@ -466,10 +464,36 @@
               const ossIncludeOwnValue = formData.get('ossIncludeOwn') === 'on';
               localStorage.setItem('oss_include_own', String(ossIncludeOwnValue));
 
-              return async ({ update }) => {
-                await update();
+              try {
+                const res = await fetch('/api/generate', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    token: tokenValue,
+                    year: formData.get('year')?.toString(),
+                    includePrivate: includePrivateValue,
+                    ossMinStars: ossMinStarsValue,
+                    ossIncludeOwn: ossIncludeOwnValue
+                  }),
+                  headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await res.json();
+                if (result.success) {
+                  stats = result.stats;
+                  showSettings = false;
+                  // Cache stats
+                  setTimeout(() => {
+                    localStorage.setItem('github_stats', JSON.stringify(result.stats));
+                  }, 0);
+                } else {
+                  console.error(result.message);
+                  alert(result.message || 'Failed to generate report');
+                }
+              } catch (err) {
+                console.error(err);
+                alert('An error occurred while generating the report');
+              } finally {
                 loading = false;
-              };
+              }
             }}
             class="space-y-4"
           >
@@ -547,10 +571,8 @@
               </div>
             </div>
 
-            {#if form?.error}
-              <div class="rounded-lg bg-red-50 p-3 text-sm text-red-600">
-                {form.message}
-              </div>
+            {#if loading}
+              <!-- Loading indicator is handled in button -->
             {/if}
 
             <div class="pt-2">
