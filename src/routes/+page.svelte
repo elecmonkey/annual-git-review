@@ -253,7 +253,7 @@
 					<h2 class="text-3xl font-bold">{stats.user.name}</h2>
 					<p class="text-lg text-gray-500">@{stats.user.login}</p>
 				</div>
-				<div class="flex-grow"></div>
+				<div class="grow"></div>
 				<div class="rounded-lg bg-gray-50 p-4 text-center md:text-right">
 					<div class="text-sm font-semibold tracking-wider text-gray-500 uppercase">
 						Total Contributions

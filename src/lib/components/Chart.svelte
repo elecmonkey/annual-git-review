@@ -12,8 +12,8 @@
 		class?: string;
 	}>();
 
-	let chartContainer: HTMLDivElement;
-	let chartInstance: echarts.ECharts | null = null;
+	let chartContainer: HTMLDivElement | undefined = $state();
+    let chartInstance: echarts.ECharts | null = null;
 
 	function initChart() {
 		if (chartContainer && !chartInstance) {
