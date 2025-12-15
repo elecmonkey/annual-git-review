@@ -336,9 +336,9 @@
             Open Source Contributions
           </h3>
 
-          <div class="grid gap-4 md:grid-cols-2">
+          <div class="grid gap-4 md:grid-cols-3">
             <!-- Summary Cards -->
-            <div class="grid gap-4 md:grid-cols-2">
+            <div class="flex flex-col gap-4">
               <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-blue-50/50 p-4">
                 <div class="rounded-lg bg-blue-100 p-3 text-blue-600">
                   <GitPullRequest class="h-6 w-6" />
@@ -361,7 +361,7 @@
             </div>
 
             <!-- Top Projects List -->
-            <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
+            <div class="rounded-xl border border-gray-100 bg-gray-50 p-4 md:col-span-2">
               <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">Top Projects</h4>
               <div class="space-y-3">
                 {#each stats.openSourceStats.projectStats.slice(0, 5) as project}
