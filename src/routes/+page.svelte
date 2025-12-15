@@ -33,6 +33,11 @@
 
   // Initialize stats and token from localStorage or form data
   onMount(() => {
+    const cachedToken = localStorage.getItem('github_token');
+    if (cachedToken) {
+      token = cachedToken;
+    }
+
     const cachedStats = localStorage.getItem('github_stats');
     if (cachedStats) {
       try {
@@ -40,11 +45,6 @@
       } catch (e) {
         console.error('Failed to parse cached stats', e);
       }
-    }
-
-    const cachedToken = localStorage.getItem('github_token');
-    if (cachedToken) {
-      token = cachedToken;
     }
 
     const cachedIncludePrivate = localStorage.getItem('include_private');
