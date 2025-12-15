@@ -23,16 +23,22 @@
   let loading = $state(false);
   let showSettings = $state(false);
   let stats: GithubStats | undefined = $state(undefined);
+  let token = $state('');
 
-  // Initialize stats from localStorage or form data
+  // Initialize stats and token from localStorage or form data
   onMount(() => {
-    const cached = localStorage.getItem('github_stats');
-    if (cached) {
+    const cachedStats = localStorage.getItem('github_stats');
+    if (cachedStats) {
       try {
-        stats = JSON.parse(cached);
+        stats = JSON.parse(cachedStats);
       } catch (e) {
         console.error('Failed to parse cached stats', e);
       }
+    }
+
+    const cachedToken = localStorage.getItem('github_token');
+    if (cachedToken) {
+      token = cachedToken;
     }
   });
 
