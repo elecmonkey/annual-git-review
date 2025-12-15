@@ -98,24 +98,37 @@
         }
       },
       visualMap: {
+        type: 'piecewise', // Switch to piecewise for better control
         min: 0,
         max: max,
         calculable: true,
         orient: 'horizontal',
         left: 'center',
         top: 'top',
-        inRange: {
-          color: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']
-        }
+        pieces: [
+          // Range for 0 commits
+          { value: 0, color: '#fff', label: '0' },
+          // Ranges for > 0 commits (split dynamically based on max)
+          { min: 1, max: Math.ceil(max * 0.25), color: '#9be9a8' },
+          { min: Math.ceil(max * 0.25) + 1, max: Math.ceil(max * 0.5), color: '#40c463' },
+          { min: Math.ceil(max * 0.5) + 1, max: Math.ceil(max * 0.75), color: '#30a14e' },
+          { min: Math.ceil(max * 0.75) + 1, max: max, color: '#216e39' }
+        ]
       },
       calendar: {
         top: 60,
         left: 30,
         right: 30,
-        cellSize: ['auto', 13] as const,
+        cellSize: [13, 13], // Square aspect ratio
         range: year,
-        itemStyle: { borderWidth: 0.5 },
-        yearLabel: { show: false }
+        itemStyle: {
+          borderWidth: 1,
+          borderColor: '#f0f0f0' // Light grey border for grid visibility
+        },
+        yearLabel: { show: false },
+        monthLabel: { show: true, nameMap: 'en' }, // Show month labels
+        dayLabel: { show: true, nameMap: 'en' }, // Ensure day labels are also shown if needed
+        splitLine: { show: false }
       },
       series: {
         type: 'heatmap',
@@ -136,7 +149,7 @@
           name: 'Languages',
           type: 'pie',
           radius: ['40%', '70%'],
-          center: ['50%', '60%'], // Chart moved down
+          center: ['50%', '55%'], // Slightly higher than 60%
           avoidLabelOverlap: false,
           itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
           label: { show: false, position: 'center' },
@@ -153,7 +166,7 @@
   ): echarts.EChartsOption {
     return {
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      grid: { left: '3%', right: '4%', bottom: '3%', top: '3%', containLabel: true },
       xAxis: { type: 'value', boundaryGap: [0, 0.01] },
       yAxis: { type: 'category', data: data.map((d) => d.name).reverse() },
       series: [

@@ -262,6 +262,30 @@ export async function getGithubStats(
   const collection = viewer.contributionsCollection;
 
   // Process Contributions by Day
+  let totalCommitContributions = collection.totalCommitContributions;
+  let totalPullRequestContributions = collection.totalPullRequestContributions;
+  let totalReviewContributions = collection.totalPullRequestReviewContributions;
+  let totalIssueContributions = collection.totalIssueContributions;
+
+  if (!includePrivate) {
+    // Recalculate Commits from Public Repos (Top 100)
+    const publicCommits = collection.commitContributionsByRepository
+      .filter((node) => !node.repository.isPrivate)
+      .reduce((sum, node) => sum + node.contributions.totalCount, 0);
+
+    totalCommitContributions = publicCommits;
+
+    // Filter public PRs (Top 100)
+    const publicPRs = collection.pullRequestContributions.nodes.filter(
+      (node) => !node.pullRequest.repository.isPrivate
+    ).length;
+
+    totalPullRequestContributions = publicPRs;
+
+    totalReviewContributions = 0;
+    totalIssueContributions = 0;
+  }
+
   const contributionsByDay: GithubStats['contributionsByDay'] = [];
   for (const week of collection.contributionCalendar.weeks) {
     for (const day of week.contributionDays) {
@@ -383,13 +407,13 @@ export async function getGithubStats(
       avatarUrl: viewer.avatarUrl
     },
     year,
-    totalCommitContributions: collection.totalCommitContributions,
-    totalPullRequestContributions: collection.totalPullRequestContributions,
-    totalReviewContributions: collection.totalPullRequestReviewContributions,
-    totalIssueContributions: collection.totalIssueContributions,
+    totalCommitContributions: totalCommitContributions,
+    totalPullRequestContributions: totalPullRequestContributions,
+    totalReviewContributions: totalReviewContributions,
+    totalIssueContributions: totalIssueContributions,
     contributionsByDay,
     topLanguages,
-    topRepositories: topRepositories.slice(0, 10), // Top 10
+    topRepositories: topRepositories.slice(0, 12), // Top 12
     openSourceStats: {
       totalPrs,
       mergedPrs,
