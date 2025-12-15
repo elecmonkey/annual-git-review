@@ -24,8 +24,9 @@
 
   $effect(() => {
     if (chartInstance && options) {
-      // Use notMerge: true to ensure clean update and avoid potential memory leaks
-      chartInstance.setOption(options, { notMerge: true });
+      // Clear chart to ensure full re-render when options change
+      chartInstance.clear();
+      chartInstance.setOption(options);
     }
   });
 
