@@ -29,13 +29,13 @@
   }
 
   // Slide Components Data
-  const slides = [
-    { id: 'intro', title: '2024 GitHub Review' },
+  let slides = $derived([
+    { id: 'intro', title: `${stats.year} GitHub Review` },
     { id: 'activity', title: 'Coding Activity' },
     { id: 'languages', title: 'Language Tech Stack' },
     { id: 'repos', title: 'Top Projects' },
     { id: 'summary', title: 'You are Amazing!' }
-  ];
+  ]);
 
   function getLanguagePieOption(data: { name: string; count: number; color: string }[]): EChartsOption {
     return {
@@ -76,12 +76,12 @@
   </button>
 
   <!-- Slide Container -->
-  <div class="relative w-full max-w-md aspect-[9/16] bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+  <div class="relative w-full max-w-md aspect-[9/16] bg-gradient-to-br from-slate-900 via-gray-900 to-slate-950 overflow-hidden shadow-2xl border border-white/10">
 
     <!-- Background Decor -->
     <div class="absolute inset-0 opacity-20 pointer-events-none">
-       <div class="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] bg-blue-500 rounded-full blur-[100px]"></div>
-       <div class="absolute bottom-[-20%] right-[-20%] w-[80%] h-[50%] bg-pink-500 rounded-full blur-[100px]"></div>
+       <div class="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] bg-emerald-500 rounded-full blur-[100px]"></div>
+       <div class="absolute bottom-[-20%] right-[-20%] w-[80%] h-[50%] bg-sky-600 rounded-full blur-[100px]"></div>
     </div>
 
     <!-- Content Area -->
@@ -98,9 +98,9 @@
             <img src={stats.user.avatarUrl} alt="Avatar" class="w-32 h-32 rounded-full border-4 border-white/20 mx-auto shadow-lg" />
             <div>
               <h2 class="text-3xl font-bold mb-2">Hi, @{stats.user.login}</h2>
-              <p class="text-white/80 text-lg">Your 2024 GitHub Journey</p>
+              <p class="text-white/80 text-lg">Your {stats.year} GitHub Journey</p>
             </div>
-            <div class="text-5xl font-black bg-gradient-to-r from-yellow-300 to-pink-400 bg-clip-text text-transparent">
+            <div class="text-5xl font-black bg-gradient-to-r from-emerald-300 to-sky-400 bg-clip-text text-transparent">
               {stats.totalCommitContributions + stats.totalPullRequestContributions + stats.totalReviewContributions + stats.totalIssueContributions}
             </div>
             <p class="text-white/60 uppercase tracking-widest text-sm">Total Contributions</p>
