@@ -130,12 +130,13 @@
   ): echarts.EChartsOption {
     return {
       tooltip: { trigger: 'item' },
-      legend: { top: '5%', left: 'center' },
+      legend: { top: '0%', left: 'center' }, // Legend moved to top
       series: [
         {
           name: 'Languages',
           type: 'pie',
           radius: ['40%', '70%'],
+          center: ['50%', '60%'], // Chart moved down
           avoidLabelOverlap: false,
           itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
           label: { show: false, position: 'center' },
