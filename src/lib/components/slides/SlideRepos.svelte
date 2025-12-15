@@ -22,3 +22,7 @@
     </div>
   {/each}
 </div>
+
+<div class="mt-8 text-center text-sm italic text-white/60">
+  "Every commit is a brick in the castle of your dreams."
+</div>
