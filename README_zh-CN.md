@@ -1,0 +1,25 @@
+# Annual Git Review
+
+[中文](./README_zh-CN.md) | [English](./README.md)
+
+基于 SvelteKit 5 构建的年度 GitHub 代码报告生成器。通过热力图、语言分布和仓库排行，可视化你的年度编程足迹。
+
+## ✨ 特性
+
+- **贡献热力图**：直观展示每日代码提交。
+- **语言与仓库统计**：分析你的时间都去哪儿了。
+
+## 🚀 快速开始
+
+```bash
+git clone https://github.com/your-username/annual-git-review.git
+cd annual-git-review
+pnpm install
+pnpm dev
+```
+
+访问 `http://localhost:5173`，输入 GitHub Token（需 `read:user` 权限），即可生成报告。
+
+## 📄 许可证
+
+MIT
