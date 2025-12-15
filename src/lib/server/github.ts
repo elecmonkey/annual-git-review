@@ -110,6 +110,11 @@ export interface GithubStats {
     count: number;
     level: string; // FIRST_QUARTILE, etc.
   }[];
+  peakDay: {
+    date: string;
+    count: number;
+    topRepo?: string;
+  };
   topLanguages: {
     name: string;
     count: number;
@@ -287,6 +292,8 @@ export async function getGithubStats(
   }
 
   const contributionsByDay: GithubStats['contributionsByDay'] = [];
+  let peakDay = { date: '', count: 0 };
+
   for (const week of collection.contributionCalendar.weeks) {
     for (const day of week.contributionDays) {
       contributionsByDay.push({
@@ -294,6 +301,9 @@ export async function getGithubStats(
         count: day.contributionCount,
         level: day.contributionLevel
       });
+      if (day.contributionCount > peakDay.count) {
+        peakDay = { date: day.date, count: day.contributionCount };
+      }
     }
   }
 
@@ -313,6 +323,11 @@ export async function getGithubStats(
   if (!includePrivate) {
     topRepositories = topRepositories.filter((repo) => !repo.isPrivate);
   }
+
+  const peakDayStats = {
+    ...peakDay,
+    topRepo: topRepositories.length > 0 ? topRepositories[0].name : undefined
+  };
 
   // Process Top Languages (weighted by commit count)
   const languageMap = new Map<string, { count: number; color: string }>();
@@ -412,6 +427,7 @@ export async function getGithubStats(
     totalReviewContributions: totalReviewContributions,
     totalIssueContributions: totalIssueContributions,
     contributionsByDay,
+    peakDay: peakDayStats,
     topLanguages,
     topRepositories: topRepositories.slice(0, 12), // Top 12
     openSourceStats: {
