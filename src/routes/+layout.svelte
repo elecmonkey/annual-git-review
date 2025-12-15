@@ -6,6 +6,7 @@
 </script>
 
 <svelte:head>
+  <title>Annual Git Review</title>
   <link rel="icon" href={favicon} />
 </svelte:head>
 {@render children()}
