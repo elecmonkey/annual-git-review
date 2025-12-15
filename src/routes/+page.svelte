@@ -354,9 +354,11 @@
                 {#each stats.openSourceStats.projectStats.slice(0, 5) as project}
                   <div class="flex items-center justify-between rounded-lg bg-white p-3 shadow-sm">
                     <div class="flex items-center gap-3">
-                      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-600">
-                        {project.name[0].toUpperCase()}
-                      </div>
+                      <img
+                        src={project.ownerAvatarUrl}
+                        alt={project.owner}
+                        class="h-8 w-8 rounded-full border border-gray-200"
+                      />
                       <div>
                         <a
                           href={project.url}
@@ -381,8 +383,15 @@
                       </div>
                     </div>
                     <div class="text-right">
-                      <div class="text-sm font-bold">{project.prsCount} PRs</div>
-                      <div class="text-xs text-green-600">{project.mergedCount} Merged</div>
+                      <div class="flex flex-row gap-1">
+                        <div class="text-sm font-bold">{project.prsCount} PRs</div>
+                        <div class="text-sm font-bold text-green-600">{project.mergedCount} merged</div>
+                      </div>
+                      <div class="text-xs font-mono">
+                        <span class="text-green-600">+{project.additions}</span>
+                        <span class="text-gray-300 mx-1">|</span>
+                        <span class="text-red-600">-{project.deletions}</span>
+                      </div>
                     </div>
                   </div>
                 {/each}

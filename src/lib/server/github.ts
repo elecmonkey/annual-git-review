@@ -60,6 +60,8 @@ interface ContributionsCollection {
       pullRequest: {
         title: string;
         state: string;
+        additions: number;
+        deletions: number;
         repository: {
           name: string;
           url: string;
@@ -67,6 +69,7 @@ interface ContributionsCollection {
           isPrivate: boolean;
           owner: {
             login: string;
+            avatarUrl: string;
           };
           primaryLanguage: {
             name: string;
@@ -127,10 +130,13 @@ export interface GithubStats {
     projectStats: {
       name: string;
       owner: string;
+      ownerAvatarUrl: string;
       url: string;
       stars: number;
       prsCount: number;
       mergedCount: number;
+      additions: number;
+      deletions: number;
       language: string | null;
       languageColor: string | null;
     }[];
@@ -227,6 +233,8 @@ export async function getGithubStats(
               pullRequest {
                 title
                 state
+                additions
+                deletions
                 repository {
                   name
                   url
@@ -234,6 +242,7 @@ export async function getGithubStats(
                   isPrivate
                   owner {
                     login
+                    avatarUrl
                   }
                   primaryLanguage {
                     name
@@ -304,10 +313,13 @@ export async function getGithubStats(
     {
       name: string;
       owner: string;
+      ownerAvatarUrl: string;
       url: string;
       stars: number;
       prsCount: number;
       mergedCount: number;
+      additions: number;
+      deletions: number;
       language: string | null;
       languageColor: string | null;
     }
@@ -320,6 +332,7 @@ export async function getGithubStats(
     const repo = node.pullRequest.repository;
 
     // Filter: Must be public
+    // Always exclude private for OSS stats regardless of includePrivate flag (OSS implies public usually)
     if (repo.isPrivate) continue;
 
     // Filter: Min stars
@@ -337,17 +350,23 @@ export async function getGithubStats(
     const existing = ossProjectMap.get(key) || {
       name: repo.name,
       owner: repo.owner.login,
+      ownerAvatarUrl: repo.owner.avatarUrl,
       url: repo.url,
       stars: repo.stargazerCount,
       prsCount: 0,
       mergedCount: 0,
+      additions: 0,
+      deletions: 0,
       language: repo.primaryLanguage?.name ?? null,
       languageColor: repo.primaryLanguage?.color ?? null
     };
 
     existing.prsCount++;
+
     if (node.pullRequest.state === 'MERGED') {
       existing.mergedCount++;
+      existing.additions += node.pullRequest.additions;
+      existing.deletions += node.pullRequest.deletions;
     }
 
     ossProjectMap.set(key, existing);
