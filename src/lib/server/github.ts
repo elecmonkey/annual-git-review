@@ -353,9 +353,9 @@ export async function getGithubStats(
     ossProjectMap.set(key, existing);
   }
 
-  const ossProjectStats = Array.from(ossProjectMap.values()).sort(
-    (a, b) => b.prsCount - a.prsCount
-  );
+  const ossProjectStats = Array.from(ossProjectMap.values())
+    .sort((a, b) => b.prsCount - a.prsCount)
+    .slice(0, 50); // Limit to top 50 projects to prevent huge payload
 
   return {
     user: {

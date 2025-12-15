@@ -66,8 +66,18 @@
   $effect(() => {
     if (form?.stats) {
       stats = form.stats;
-      localStorage.setItem('github_stats', JSON.stringify(stats));
       showSettings = false;
+
+      // Defer localStorage writing to avoid blocking UI rendering
+      setTimeout(() => {
+        try {
+          // Clone to avoid potential proxy issues with Svelte 5 state
+          const statsClone = JSON.parse(JSON.stringify(form.stats));
+          localStorage.setItem('github_stats', JSON.stringify(statsClone));
+        } catch (e) {
+          console.error('Failed to save stats to localStorage', e);
+        }
+      }, 0);
     }
   });
 

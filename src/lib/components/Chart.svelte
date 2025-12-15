@@ -22,10 +22,10 @@
     }
   }
 
-  // Effect to update chart when options change
   $effect(() => {
     if (chartInstance && options) {
-      chartInstance.setOption(options);
+      // Use notMerge: true to ensure clean update and avoid potential memory leaks
+      chartInstance.setOption(options, { notMerge: true });
     }
   });
 
