@@ -136,7 +136,11 @@ async function fetchGraphQL<T>(
   return json.data;
 }
 
-export async function getGithubStats(token: string, year: number): Promise<GithubStats> {
+export async function getGithubStats(
+  token: string,
+  year: number,
+  includePrivate = true
+): Promise<GithubStats> {
   const from = `${year}-01-01T00:00:00Z`;
   const to = `${year}-12-31T23:59:59Z`;
 
@@ -151,7 +155,7 @@ export async function getGithubStats(token: string, year: number): Promise<Githu
           totalPullRequestContributions
           totalPullRequestReviewContributions
           totalIssueContributions
-          
+
           contributionCalendar {
             totalContributions
             weeks {
@@ -202,7 +206,7 @@ export async function getGithubStats(token: string, year: number): Promise<Githu
   }
 
   // Process Top Repositories
-  const topRepositories = collection.commitContributionsByRepository
+  let topRepositories = collection.commitContributionsByRepository
     .map((node) => ({
       name: node.repository.name,
       owner: node.repository.owner.login,
@@ -213,6 +217,10 @@ export async function getGithubStats(token: string, year: number): Promise<Githu
       url: node.repository.url
     }))
     .sort((a, b) => b.commits - a.commits);
+
+  if (!includePrivate) {
+    topRepositories = topRepositories.filter((repo) => !repo.isPrivate);
+  }
 
   // Process Top Languages (weighted by commit count)
   const languageMap = new Map<string, { count: number; color: string }>();

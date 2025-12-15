@@ -24,6 +24,7 @@
   let showSettings = $state(false);
   let stats: GithubStats | undefined = $state(undefined);
   let token = $state('');
+  let includePrivate = $state(true);
 
   // Initialize stats and token from localStorage or form data
   onMount(() => {
@@ -39,6 +40,11 @@
     const cachedToken = localStorage.getItem('github_token');
     if (cachedToken) {
       token = cachedToken;
+    }
+
+    const cachedIncludePrivate = localStorage.getItem('include_private');
+    if (cachedIncludePrivate !== null) {
+      includePrivate = cachedIncludePrivate === 'true';
     }
   });
 
@@ -306,8 +312,16 @@
         <div class="p-6">
           <form
             method="POST"
-            use:enhance={() => {
+            use:enhance={({ formData }) => {
               loading = true;
+              const tokenValue = formData.get('token')?.toString();
+              if (tokenValue) {
+                localStorage.setItem('github_token', tokenValue);
+              }
+
+              const includePrivateValue = formData.get('includePrivate') === 'on';
+              localStorage.setItem('include_private', String(includePrivateValue));
+
               return async ({ update }) => {
                 await update();
                 loading = false;
@@ -316,16 +330,15 @@
             class="space-y-4"
           >
             <div>
-              <label for="token" class="mb-1 block text-sm font-medium text-gray-700"
-                >GitHub Personal Access Token</label
-              >
+              <label for="token" class="block text-sm font-medium text-gray-700 mb-1">GitHub Personal Access Token</label>
               <input
                 type="password"
                 name="token"
                 id="token"
+                bind:value={token}
                 required
                 placeholder="ghp_..."
-                class="w-full rounded-lg border border-gray-300 px-4 py-2 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-black"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
               />
               <p class="mt-1 text-xs text-gray-500">
                 Token requires <code>read:user</code> scope. It is not stored on server.
@@ -341,6 +354,19 @@
                 value={new Date().getFullYear()}
                 class="w-full rounded-lg border border-gray-300 px-4 py-2 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-black"
               />
+            </div>
+
+            <div class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="includePrivate"
+                id="includePrivate"
+                bind:checked={includePrivate}
+                class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+              />
+              <label for="includePrivate" class="text-sm font-medium text-gray-700">
+                Include private repositories in report
+              </label>
             </div>
 
             {#if form?.error}

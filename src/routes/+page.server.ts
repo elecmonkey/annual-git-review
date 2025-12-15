@@ -7,6 +7,7 @@ export const actions = {
     const data = await request.formData();
     const token = data.get('token')?.toString();
     const yearStr = data.get('year')?.toString();
+    const includePrivate = data.get('includePrivate') === 'on';
 
     if (!token) {
       return fail(400, { missing: true, message: 'GitHub Token is required' });
@@ -15,7 +16,7 @@ export const actions = {
     const year = yearStr ? parseInt(yearStr) : new Date().getFullYear();
 
     try {
-      const stats = await getGithubStats(token, year);
+      const stats = await getGithubStats(token, year, includePrivate);
       return { success: true, stats };
     } catch (err) {
       console.error(err);
