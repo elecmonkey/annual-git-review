@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:edgeone": "ADAPTER=edgeone vite build",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -17,6 +18,7 @@
     "@edgeone/sveltekit": "^1.0.0",
     "@eslint/compat": "^2.0.0",
     "@eslint/js": "^9.39.2",
+    "@sveltejs/adapter-auto": "^7.0.0",
     "@sveltejs/kit": "^2.49.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tailwindcss/typography": "^0.5.19",

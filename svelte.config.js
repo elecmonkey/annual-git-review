@@ -1,4 +1,5 @@
-import adapter from '@edgeone/sveltekit';
+import adapterEdgeOne from '@edgeone/sveltekit';
+import adapterAuto from '@sveltejs/adapter-auto';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -8,8 +9,8 @@ const config = {
   preprocess: vitePreprocess(),
 
   kit: {
-    // use edgeone adapter
-    adapter: adapter()
+    // use adapter based on environment variable
+    adapter: process.env.ADAPTER === 'edgeone' ? adapterEdgeOne() : adapterAuto()
   }
 };
 
