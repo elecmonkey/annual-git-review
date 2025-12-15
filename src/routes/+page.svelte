@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms';
   import type { ActionData } from './$types';
   import Chart from '$lib/components/Chart.svelte';
+  import GithubIcon from '$lib/components/GitHubIcon.svelte';
   import {
     Loader2,
     Github,
@@ -184,19 +185,30 @@
 
 <div class="min-h-screen bg-gray-50 pb-10 font-sans text-gray-900">
   <!-- Header -->
-  <header class="sticky top-0 z-10 mb-8 border-b border-gray-200 bg-white px-4 py-6 shadow-sm">
-    <div class="mx-auto flex max-w-6xl items-center justify-between">
+  <header class="sticky top-0 z-10 mb-8 border-b border-gray-200 bg-white py-6 shadow-sm">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-4">
       <div class="flex items-center gap-3">
         <Github class="h-8 w-8" />
         <h1 class="text-2xl font-bold tracking-tight">Annual Git Review</h1>
       </div>
-      <button
-        class="rounded-full p-2 transition-colors hover:bg-gray-100"
-        onclick={() => (showSettings = true)}
-        aria-label="Settings"
-      >
-        <Settings class="h-6 w-6 text-gray-600" />
-      </button>
+      <div class="flex items-center gap-2">
+        <a
+          href="https://github.com/elecmonkey/annual-git-review"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
+          aria-label="View on GitHub"
+        >
+          <GithubIcon class="h-6 w-6" />
+        </a>
+        <button
+          class="rounded-full p-2 transition-colors hover:bg-gray-100"
+          onclick={() => (showSettings = true)}
+          aria-label="Settings"
+        >
+          <Settings class="h-6 w-6 text-gray-600" />
+        </button>
+      </div>
     </div>
   </header>
 
