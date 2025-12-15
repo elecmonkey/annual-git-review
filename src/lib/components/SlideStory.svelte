@@ -8,6 +8,7 @@
   import SlideActivity from './slides/SlideActivity.svelte';
   import SlideLanguages from './slides/SlideLanguages.svelte';
   import SlideRepos from './slides/SlideRepos.svelte';
+  import SlideOpenSource from './slides/SlideOpenSource.svelte';
   import SlideSummary from './slides/SlideSummary.svelte';
 
   let { stats, onClose } = $props<{
@@ -16,7 +17,7 @@
   }>();
 
   let currentSlide = $state(0);
-  const totalSlides = 5;
+  const totalSlides = 6;
 
   function nextSlide() {
     if (currentSlide < totalSlides - 1) currentSlide++;
@@ -63,7 +64,7 @@
 
   <!-- Slide Container -->
   <div
-    class="relative aspect-[9/16] w-full max-w-md overflow-hidden border border-white/10 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-950 shadow-2xl"
+    class="relative aspect-[9/16] w-full max-w-md overflow-hidden bg-gradient-to-br from-slate-900 via-gray-900 to-slate-950 shadow-2xl"
   >
     <!-- Background Decor -->
     <div class="pointer-events-none absolute inset-0 opacity-20">
@@ -91,6 +92,8 @@
         {:else if currentSlide === 3}
           <SlideRepos {stats} />
         {:else if currentSlide === 4}
+          <SlideOpenSource {stats} />
+        {:else if currentSlide === 5}
           <SlideSummary {stats} />
         {/if}
       </div>
