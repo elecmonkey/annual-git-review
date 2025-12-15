@@ -1,13 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import * as echarts from 'echarts';
+  import echarts from '$lib/echarts';
+  import type { EChartsOption } from 'echarts';
 
   let {
     options,
     height = '400px',
     class: className = ''
   } = $props<{
-    options: echarts.EChartsOption;
+    options: EChartsOption;
     height?: string;
     class?: string;
   }>();

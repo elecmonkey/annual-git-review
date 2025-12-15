@@ -3,6 +3,7 @@
   import type { ActionData } from './$types';
   import Chart from '$lib/components/Chart.svelte';
   import GithubIcon from '$lib/components/GitHubIcon.svelte';
+  import type { EChartsOption } from 'echarts';
   import {
     Loader2,
     Github,
@@ -85,7 +86,7 @@
   function getHeatmapOptions(
     data: { date: string; count: number }[],
     year: number
-  ): echarts.EChartsOption {
+  ): EChartsOption {
     const heatmapData = data.map((item) => [item.date, item.count]);
     const max = Math.max(...data.map((d) => d.count), 5);
 
@@ -94,8 +95,8 @@
         position: 'top',
         formatter: function (p: unknown) {
           const params = p as { data: [string, number] };
-          const format = echarts.format.formatTime('yyyy-MM-dd', params.data[0]);
-          return format + ': ' + params.data[1];
+          // Simple date formatter instead of importing full echarts
+          return params.data[0] + ': ' + params.data[1];
         }
       },
       visualMap: {
@@ -141,7 +142,7 @@
 
   function getLanguageOptions(
     data: { name: string; count: number; color: string }[]
-  ): echarts.EChartsOption {
+  ): EChartsOption {
     return {
       tooltip: { trigger: 'item' },
       legend: { top: '0%', left: 'center' }, // Legend moved to top
@@ -164,7 +165,7 @@
 
   function getRepoOptions(
     data: { name: string; commits: number; languageColor: string | null }[]
-  ): echarts.EChartsOption {
+  ): EChartsOption {
     return {
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       grid: { left: '3%', right: '4%', bottom: '3%', top: '3%', containLabel: true },
