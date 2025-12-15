@@ -8,6 +8,8 @@ export const actions = {
     const token = data.get('token')?.toString();
     const yearStr = data.get('year')?.toString();
     const includePrivate = data.get('includePrivate') === 'on';
+    const ossMinStars = parseInt(data.get('ossMinStars')?.toString() || '0');
+    const ossIncludeOwn = data.get('ossIncludeOwn') === 'on';
 
     if (!token) {
       return fail(400, { missing: true, message: 'GitHub Token is required' });
@@ -16,7 +18,7 @@ export const actions = {
     const year = yearStr ? parseInt(yearStr) : new Date().getFullYear();
 
     try {
-      const stats = await getGithubStats(token, year, includePrivate);
+      const stats = await getGithubStats(token, year, includePrivate, ossMinStars, ossIncludeOwn);
       return { success: true, stats };
     } catch (err) {
       console.error(err);

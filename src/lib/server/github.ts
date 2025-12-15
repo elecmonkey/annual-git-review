@@ -55,6 +55,27 @@ interface ContributionsCollection {
   totalIssueContributions: number;
   contributionCalendar: ContributionCalendar;
   commitContributionsByRepository: CommitContributionsByRepository[];
+  pullRequestContributions: {
+    nodes: {
+      pullRequest: {
+        title: string;
+        state: string;
+        repository: {
+          name: string;
+          url: string;
+          stargazerCount: number;
+          isPrivate: boolean;
+          owner: {
+            login: string;
+          };
+          primaryLanguage: {
+            name: string;
+            color: string;
+          } | null;
+        };
+      };
+    }[];
+  };
 }
 
 interface Viewer {
@@ -100,6 +121,20 @@ export interface GithubStats {
     isPrivate: boolean;
     url: string;
   }[];
+  openSourceStats: {
+    totalPrs: number;
+    mergedPrs: number;
+    projectStats: {
+      name: string;
+      owner: string;
+      url: string;
+      stars: number;
+      prsCount: number;
+      mergedCount: number;
+      language: string | null;
+      languageColor: string | null;
+    }[];
+  };
 }
 
 // --- Functions ---
@@ -139,7 +174,9 @@ async function fetchGraphQL<T>(
 export async function getGithubStats(
   token: string,
   year: number,
-  includePrivate = true
+  includePrivate = true,
+  ossMinStars = 0,
+  ossIncludeOwn = true
 ): Promise<GithubStats> {
   const from = `${year}-01-01T00:00:00Z`;
   const to = `${year}-12-31T23:59:59Z`;
@@ -182,6 +219,28 @@ export async function getGithubStats(
             }
             contributions {
               totalCount
+            }
+          }
+
+          pullRequestContributions(first: 100, orderBy: {direction: DESC}) {
+            nodes {
+              pullRequest {
+                title
+                state
+                repository {
+                  name
+                  url
+                  stargazerCount
+                  isPrivate
+                  owner {
+                    login
+                  }
+                  primaryLanguage {
+                    name
+                    color
+                  }
+                }
+              }
             }
           }
         }
@@ -238,6 +297,66 @@ export async function getGithubStats(
     .map(([name, { count, color }]) => ({ name, count, color }))
     .sort((a, b) => b.count - a.count);
 
+  // Process Open Source Stats
+  const prNodes = collection.pullRequestContributions.nodes;
+  const ossProjectMap = new Map<
+    string,
+    {
+      name: string;
+      owner: string;
+      url: string;
+      stars: number;
+      prsCount: number;
+      mergedCount: number;
+      language: string | null;
+      languageColor: string | null;
+    }
+  >();
+
+  let totalPrs = 0;
+  let mergedPrs = 0;
+
+  for (const node of prNodes) {
+    const repo = node.pullRequest.repository;
+
+    // Filter: Must be public
+    if (repo.isPrivate) continue;
+
+    // Filter: Min stars
+    if (repo.stargazerCount < ossMinStars) continue;
+
+    // Filter: Include own?
+    if (!ossIncludeOwn && repo.owner.login === viewer.login) continue;
+
+    totalPrs++;
+    if (node.pullRequest.state === 'MERGED') {
+      mergedPrs++;
+    }
+
+    const key = repo.url;
+    const existing = ossProjectMap.get(key) || {
+      name: repo.name,
+      owner: repo.owner.login,
+      url: repo.url,
+      stars: repo.stargazerCount,
+      prsCount: 0,
+      mergedCount: 0,
+      language: repo.primaryLanguage?.name ?? null,
+      languageColor: repo.primaryLanguage?.color ?? null
+    };
+
+    existing.prsCount++;
+    if (node.pullRequest.state === 'MERGED') {
+      existing.mergedCount++;
+    }
+
+    ossProjectMap.set(key, existing);
+  }
+
+  const ossProjectStats = Array.from(ossProjectMap.values()).sort(
+    (a, b) => b.prsCount - a.prsCount
+  );
+
   return {
     user: {
       login: viewer.login,
@@ -251,6 +370,11 @@ export async function getGithubStats(
     totalIssueContributions: collection.totalIssueContributions,
     contributionsByDay,
     topLanguages,
-    topRepositories: topRepositories.slice(0, 10) // Top 10
+    topRepositories: topRepositories.slice(0, 10), // Top 10
+    openSourceStats: {
+      totalPrs,
+      mergedPrs,
+      projectStats: ossProjectStats
+    }
   };
 }

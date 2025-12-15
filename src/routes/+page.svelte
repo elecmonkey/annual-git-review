@@ -12,7 +12,10 @@
     MessageSquare,
     Star,
     Settings,
-    X
+    X,
+    Globe,
+    GitMerge,
+    ExternalLink
   } from 'lucide-svelte';
   import * as echarts from 'echarts';
   import { onMount } from 'svelte';
@@ -25,6 +28,8 @@
   let stats: GithubStats | undefined = $state(undefined);
   let token = $state('');
   let includePrivate = $state(true);
+  let ossMinStars = $state(0);
+  let ossIncludeOwn = $state(true);
 
   // Initialize stats and token from localStorage or form data
   onMount(() => {
@@ -45,6 +50,16 @@
     const cachedIncludePrivate = localStorage.getItem('include_private');
     if (cachedIncludePrivate !== null) {
       includePrivate = cachedIncludePrivate === 'true';
+    }
+
+    const cachedOssMinStars = localStorage.getItem('oss_min_stars');
+    if (cachedOssMinStars) {
+      ossMinStars = parseInt(cachedOssMinStars);
+    }
+
+    const cachedOssIncludeOwn = localStorage.getItem('oss_include_own');
+    if (cachedOssIncludeOwn !== null) {
+      ossIncludeOwn = cachedOssIncludeOwn === 'true';
     }
   });
 
@@ -197,7 +212,7 @@
           <h2 class="text-3xl font-bold">{stats.user.name}</h2>
           <p class="text-lg text-gray-500">@{stats.user.login}</p>
         </div>
-        <div class="flex-grow"></div>
+        <div class="grow"></div>
         <div class="rounded-lg bg-gray-50 p-4 text-center md:text-right">
           <div class="text-sm font-semibold tracking-wider text-gray-500 uppercase">
             Total Contributions
@@ -288,6 +303,83 @@
           <Chart options={getRepoOptions(stats.topRepositories)} height="400px" />
         </div>
       </div>
+
+      <!-- Open Source Stats -->
+      {#if stats.openSourceStats && stats.openSourceStats.totalPrs > 0}
+        <div class="mt-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+          <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold">
+            <Globe class="h-5 w-5 text-gray-500" />
+            Open Source Contributions
+          </h3>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <!-- Summary Cards -->
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-blue-50/50 p-4">
+                <div class="rounded-lg bg-blue-100 p-3 text-blue-600">
+                  <GitPullRequest class="h-6 w-6" />
+                </div>
+                <div>
+                  <div class="text-2xl font-bold text-gray-900">{stats.openSourceStats.totalPrs}</div>
+                  <div class="text-sm font-medium text-gray-500">Total PRs</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-purple-50/50 p-4">
+                <div class="rounded-lg bg-purple-100 p-3 text-purple-600">
+                  <GitMerge class="h-6 w-6" />
+                </div>
+                <div>
+                  <div class="text-2xl font-bold text-gray-900">{stats.openSourceStats.mergedPrs}</div>
+                  <div class="text-sm font-medium text-gray-500">Merged PRs</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Projects List -->
+            <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
+              <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">Top Projects</h4>
+              <div class="space-y-3">
+                {#each stats.openSourceStats.projectStats.slice(0, 5) as project}
+                  <div class="flex items-center justify-between rounded-lg bg-white p-3 shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-600">
+                        {project.name[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="flex items-center gap-1 font-medium hover:underline hover:text-blue-600"
+                        >
+                          {project.owner}/{project.name}
+                          <ExternalLink class="h-3 w-3 opacity-50" />
+                        </a>
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                          <span class="flex items-center gap-1">
+                            <Star class="h-3 w-3" /> {project.stars}
+                          </span>
+                          {#if project.language}
+                            <span class="flex items-center gap-1">
+                              <span class="h-2 w-2 rounded-full" style="background-color: {project.languageColor}"></span>
+                              {project.language}
+                            </span>
+                          {/if}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-sm font-bold">{project.prsCount} PRs</div>
+                      <div class="text-xs text-green-600">{project.mergedCount} Merged</div>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          </div>
+        </div>
+      {/if}
     {/if}
   </main>
 
@@ -321,6 +413,12 @@
 
               const includePrivateValue = formData.get('includePrivate') === 'on';
               localStorage.setItem('include_private', String(includePrivateValue));
+
+              const ossMinStarsValue = formData.get('ossMinStars')?.toString() || '0';
+              localStorage.setItem('oss_min_stars', ossMinStarsValue);
+
+              const ossIncludeOwnValue = formData.get('ossIncludeOwn') === 'on';
+              localStorage.setItem('oss_include_own', String(ossIncludeOwnValue));
 
               return async ({ update }) => {
                 await update();
@@ -367,6 +465,40 @@
               <label for="includePrivate" class="text-sm font-medium text-gray-700">
                 Include private repositories in report
               </label>
+            </div>
+
+            <div class="space-y-3 border-t border-gray-100 pt-3">
+              <h3 class="text-sm font-semibold text-gray-900">Open Source Settings</h3>
+
+              <div>
+                <label for="ossMinStars" class="mb-1 block text-sm font-medium text-gray-700">
+                  Min Stars Threshold
+                </label>
+                <input
+                  type="number"
+                  name="ossMinStars"
+                  id="ossMinStars"
+                  bind:value={ossMinStars}
+                  min="0"
+                  class="w-full rounded-lg border border-gray-300 px-4 py-2 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-black"
+                />
+                <p class="mt-1 text-xs text-gray-500">
+                  Minimum stars for a repo to count as "Open Source" contribution.
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="ossIncludeOwn"
+                  id="ossIncludeOwn"
+                  bind:checked={ossIncludeOwn}
+                  class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                />
+                <label for="ossIncludeOwn" class="text-sm font-medium text-gray-700">
+                  Include my own repositories
+                </label>
+              </div>
             </div>
 
             {#if form?.error}
