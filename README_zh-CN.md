@@ -1,13 +1,8 @@
 # Annual Git Review
 
-[中文](./README_zh-CN.md) | [English](./README.md)
+[English](./README.md) | 简体中文
 
 基于 SvelteKit 5 构建的年度 GitHub 代码报告生成器。通过热力图、语言分布和仓库排行，可视化你的年度编程足迹。
-
-## ✨ 特性
-
-- **贡献热力图**：直观展示每日代码提交。
-- **语言与仓库统计**：分析你的时间都去哪儿了。
 
 ## 🚀 快速开始
 

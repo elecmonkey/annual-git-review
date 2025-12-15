@@ -1,13 +1,8 @@
 # Annual Git Review
 
-[中文](./README_zh-CN.md) | [English](./README.md)
+English | [简体中文](./README_zh-CN.md)
 
 A clean and beautiful annual GitHub report generator built with SvelteKit 5. Visualize your year in code with commit heatmaps, language stats, and repository rankings.
-
-## ✨ Features
-
-- **Contribution Heatmap**: Daily commit visualization.
-- **Language & Repo Stats**: See where you spent your time.
 
 ## 🚀 Quick Start
 
