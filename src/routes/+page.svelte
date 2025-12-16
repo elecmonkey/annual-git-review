@@ -180,7 +180,7 @@
               class="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><path d="m9 16 6-6"/></svg>
-              Story Mode
+              {m.home_story_mode()}
             </button>
           {/if}
           <a
@@ -256,7 +256,7 @@
         <div class="grow"></div>
         <div class="rounded-lg bg-gray-50 p-4 text-center md:text-right">
           <div class="text-sm font-semibold tracking-wider text-gray-500 uppercase">
-            Total Contributions
+            {stats.year} Total Contributions
           </div>
           <div class="text-4xl font-bold text-green-600">
             {stats.totalCommitContributions +
@@ -264,7 +264,6 @@
               stats.totalReviewContributions +
               stats.totalIssueContributions}
           </div>
-          <div class="text-sm text-gray-400">in {stats.year}</div>
         </div>
       </div>
 
@@ -334,7 +333,7 @@
         <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
           <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold">
             <Code class="h-5 w-5 text-gray-500" />
-            Top Languages
+            {m.home_top_languages()}
           </h3>
           <Chart options={getLanguageOptions(stats.topLanguages)} height="400px" />
         </div>
@@ -343,7 +342,7 @@
         <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
           <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold">
             <Github class="h-5 w-5 text-gray-500" />
-            Top Repositories
+            {m.home_top_repositories()}
           </h3>
           <Chart options={getRepoOptions(stats.topRepositories)} height="400px" />
         </div>
@@ -354,7 +353,7 @@
         <div class="mt-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
           <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold">
             <Globe class="h-5 w-5 text-gray-500" />
-            Open Source Contributions
+            {m.home_open_source_contributions()}
           </h3>
 
           <div class="grid gap-4 md:grid-cols-3">
@@ -366,7 +365,7 @@
                 </div>
                 <div>
                   <div class="text-2xl font-bold text-gray-900">{stats.openSourceStats.totalPrs}</div>
-                  <div class="text-sm font-medium text-gray-500">Total PRs</div>
+                  <div class="text-sm font-medium text-gray-500">{m.home_total_prs()}</div>
                 </div>
               </div>
 
@@ -376,14 +375,14 @@
                 </div>
                 <div>
                   <div class="text-2xl font-bold text-gray-900">{stats.openSourceStats.mergedPrs}</div>
-                  <div class="text-sm font-medium text-gray-500">Merged PRs</div>
+                  <div class="text-sm font-medium text-gray-500">{m.home_merged_prs()}</div>
                 </div>
               </div>
             </div>
 
             <!-- Top Projects List -->
             <div class="rounded-xl border border-gray-100 bg-gray-50 p-4 md:col-span-2">
-              <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">Top Projects</h4>
+              <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">{m.home_top_projects()}</h4>
               <div class="space-y-3">
                 {#each stats.openSourceStats.projectStats.slice(0, 5) as project}
                   <div class="flex items-center justify-between rounded-lg bg-white p-3 shadow-sm">

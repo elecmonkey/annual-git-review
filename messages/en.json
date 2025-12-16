@@ -62,5 +62,12 @@
   "home_oss_min_stars_threshold": "Min Stars Threshold",
   "home_oss_min_stars_help": "Minimum stars for a repo to count as \"Open Source\" contribution.",
   "home_oss_include_own_label": "Include my own repositories",
-  "theme_select_title": "Select Theme"
+  "theme_select_title": "Select Theme",
+  "home_top_languages": "Top Languages",
+  "home_top_repositories": "Top Repositories",
+  "home_open_source_contributions": "Open Source Contributions",
+  "home_total_prs": "Total PRs",
+  "home_merged_prs": "Merged PRs",
+  "home_top_projects": "Top Projects",
+  "home_story_mode": "Story Mode"
 }
