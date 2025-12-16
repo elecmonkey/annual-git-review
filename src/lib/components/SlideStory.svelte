@@ -1,7 +1,8 @@
 <script lang="ts">
   import { fade, fly } from 'svelte/transition';
-  import { ChevronLeft, ChevronRight, X } from 'lucide-svelte';
+  import { ChevronLeft, ChevronRight, X, Download } from 'lucide-svelte';
   import type { GithubStats } from '$lib/server/github';
+  import { toPng } from 'html-to-image';
 
   // Import extracted slide components
   import SlideIntro from './slides/SlideIntro.svelte';
@@ -18,6 +19,8 @@
 
   let currentSlide = $state(0);
   const totalSlides = 6;
+  let slideRef: HTMLElement | undefined = $state();
+  let isDownloading = $state(false);
 
   function nextSlide() {
     if (currentSlide < totalSlides - 1) currentSlide++;
@@ -25,6 +28,24 @@
 
   function prevSlide() {
     if (currentSlide > 0) currentSlide--;
+  }
+
+  async function downloadSlide() {
+    if (!slideRef) return;
+    isDownloading = true;
+    try {
+      // Small delay to ensure any transitions are finished or UI is stable if needed
+      // but usually html-to-image handles static snapshot well.
+      const dataUrl = await toPng(slideRef, { cacheBust: true, pixelRatio: 2 });
+      const link = document.createElement('a');
+      link.download = `git-review-2024-slide-${currentSlide + 1}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to download slide:', err);
+    } finally {
+      isDownloading = false;
+    }
   }
 
   // Handle keyboard navigation
@@ -47,6 +68,15 @@
   </button>
 
   <button
+    onclick={downloadSlide}
+    disabled={isDownloading}
+    class="absolute right-20 top-7 z-50 text-white/70 transition-all hover:text-white disabled:opacity-50"
+    title="Download Slide"
+  >
+    <Download size={28} />
+  </button>
+
+  <button
     onclick={prevSlide}
     class="absolute left-4 z-50 text-white/50 transition-all hover:text-white disabled:opacity-0 md:left-10"
     disabled={currentSlide === 0}
@@ -64,6 +94,7 @@
 
   <!-- Slide Container -->
   <div
+    bind:this={slideRef}
     class="relative aspect-[9/16] w-full max-w-md overflow-hidden bg-gradient-to-br from-slate-900 via-gray-900 to-slate-950 shadow-2xl"
   >
     <!-- Background Decor -->

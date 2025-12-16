@@ -6,7 +6,7 @@
 
 <h3 class="mb-6 text-2xl font-bold">Top Projects</h3>
 <div class="w-full space-y-4 text-left">
-  {#each stats.topRepositories.slice(0, 4) as repo, i}
+  {#each stats.topRepositories.slice(0, 6) as repo, i}
     <div
       class="flex items-center gap-4 rounded-xl border border-white/5 bg-white/10 p-4 backdrop-blur-sm"
     >

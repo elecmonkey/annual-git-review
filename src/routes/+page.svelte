@@ -405,7 +405,6 @@
                       </div>
                       <div class="text-xs font-mono">
                         <span class="text-green-600">+{project.additions}</span>
-                        <span class="text-gray-300 mx-1">|</span>
                         <span class="text-red-600">-{project.deletions}</span>
                       </div>
                     </div>
