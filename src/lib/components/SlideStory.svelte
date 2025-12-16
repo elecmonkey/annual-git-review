@@ -1,9 +1,10 @@
 <script lang="ts">
   import { fade, fly } from 'svelte/transition';
-  import { ChevronLeft, ChevronRight, X, Download, Settings } from 'lucide-svelte';
+  import { ChevronLeft, ChevronRight, X, Download, Settings, Palette } from 'lucide-svelte';
   import type { GithubStats } from '$lib/server/github';
   import { toPng } from 'html-to-image';
   import { theme } from '$lib/theme.svelte';
+  import ThemeModal from './ThemeModal.svelte';
   import SettingsModal from './SettingsModal.svelte';
 
   // Import extracted slide components
@@ -23,6 +24,7 @@
   const totalSlides = 6;
   let slideRef: HTMLElement | undefined = $state();
   let isDownloading = $state(false);
+  let showTheme = $state(false);
   let showSettings = $state(false);
 
   function nextSlide() {
@@ -79,9 +81,17 @@
   </button>
 
   <button
+    onclick={() => (showTheme = true)}
+    class="absolute right-32 top-7 z-50 text-white/70 transition-all hover:text-white"
+    title="Change Theme"
+  >
+    <Palette size={28} />
+  </button>
+
+  <button
     onclick={downloadSlide}
     disabled={isDownloading}
-    class="absolute right-32 top-7 z-50 text-white/70 transition-all hover:text-white disabled:opacity-50"
+    class="absolute right-44 top-7 z-50 text-white/70 transition-all hover:text-white disabled:opacity-50"
     title="Download Slide"
   >
     <Download size={28} />
@@ -153,6 +163,10 @@
       </div>
     {/each}
   </div>
+
+  {#if showTheme}
+    <ThemeModal onClose={() => (showTheme = false)} />
+  {/if}
 
   {#if showSettings}
     <SettingsModal onClose={() => (showSettings = false)} />
