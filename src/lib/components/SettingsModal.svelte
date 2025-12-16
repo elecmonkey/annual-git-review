@@ -2,12 +2,13 @@
   import { X } from 'lucide-svelte';
   import { fade, scale } from 'svelte/transition';
   import { settings } from '$lib/settings.svelte';
+  import * as m from '$lib/paraglide/messages';
 
   let { onClose } = $props<{ onClose: () => void }>();
 </script>
 
 <div
-  class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+  class="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm"
   transition:fade
 >
   <div
@@ -15,7 +16,7 @@
     in:scale={{ start: 0.95 }}
   >
     <div class="mb-6 flex items-center justify-between">
-      <h2 class="text-xl font-bold text-white">Settings</h2>
+      <h2 class="text-xl font-bold text-white">{m.settings_title()}</h2>
       <button onclick={onClose} class="text-white/60 hover:text-white">
         <X size={24} />
       </button>
@@ -25,61 +26,64 @@
       <!-- Language Count Setting -->
       <div class="space-y-2">
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">Tech Stack Count</h3>
+          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">{m.settings_language_count()}</h3>
           <span class="text-sm font-bold text-white">{settings.languageCount}</span>
         </div>
         <input
           type="range"
           min="1"
           max="10"
+          step="1"
           bind:value={settings.languageCount}
           class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-emerald-500"
         />
         <p class="text-xs text-white/40">
-          Number of languages to show in badges and pie chart.
+          {m.settings_language_count_desc()}
         </p>
       </div>
 
       <!-- Repo Count Setting -->
       <div class="space-y-2">
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">Top Projects Count</h3>
+          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">{m.settings_repo_count()}</h3>
           <span class="text-sm font-bold text-white">{settings.repoCount}</span>
         </div>
         <input
           type="range"
           min="1"
           max="6"
+          step="1"
           bind:value={settings.repoCount}
           class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-emerald-500"
         />
         <p class="text-xs text-white/40">
-          Number of top repositories to display.
+          {m.settings_repo_count_desc()}
         </p>
       </div>
 
       <!-- OSS Count Setting -->
       <div class="space-y-2">
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">Open Source Count</h3>
+          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">{m.settings_oss_count()}</h3>
           <span class="text-sm font-bold text-white">{settings.ossCount}</span>
         </div>
         <input
           type="range"
           min="1"
           max="6"
+          step="1"
           bind:value={settings.ossCount}
           class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-emerald-500"
         />
         <p class="text-xs text-white/40">
-          Number of open source contributions to display.
+          {m.settings_oss_count_desc()}
         </p>
       </div>
 
       <!-- Show Green Wall Setting -->
       <div class="space-y-2">
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">Contribution Graph</h3>
+          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">{m.settings_show_green_wall()}</h3>
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="checkbox" bind:checked={settings.showGreenWall} class="peer sr-only" />
             <div
@@ -88,7 +92,7 @@
           </label>
         </div>
         <p class="text-xs text-white/40">
-          Show GitHub contribution calendar on the intro slide.
+          {m.settings_show_green_wall_desc()}
         </p>
       </div>
 

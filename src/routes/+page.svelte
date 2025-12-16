@@ -20,8 +20,8 @@
     GitMerge,
     ExternalLink
   } from 'lucide-svelte';
-
-  // let { form } = $props<{ form: ActionData }>();
+  import { switchLanguage, getLanguage } from '$lib/i18n.svelte';
+  import * as m from '$lib/paraglide/messages';
 
   let loading = $state(false);
   let showSettings = $state(false);
@@ -192,13 +192,23 @@
           >
             <GithubIcon class="h-6 w-6" />
           </a>
-          <button
-            class="rounded-full p-2 transition-colors hover:bg-gray-100"
-            onclick={() => (showSettings = true)}
-            aria-label="Settings"
-          >
-            <Settings class="h-6 w-6 text-gray-600" />
-          </button>
+          <div class="flex items-center gap-4">
+            <button
+              class="rounded-full bg-white px-3 py-2 shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center gap-2"
+              onclick={() => switchLanguage(getLanguage() === 'en' ? 'zh-CN' : 'en')}
+              aria-label="Switch Language"
+            >
+              <Globe class="h-4 w-4 text-gray-600" />
+              <span class="text-sm font-medium text-gray-600">{getLanguage() === 'en' ? '中文' : 'EN'}</span>
+            </button>
+            <button
+              class="rounded-full bg-white p-2 shadow-sm transition-transform hover:scale-105 active:scale-95"
+              onclick={() => (showSettings = true)}
+              aria-label="Settings"
+            >
+              <Settings class="h-6 w-6 text-gray-600" />
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -302,13 +312,17 @@
         </div>
       </div>
 
-      <!-- Contribution Calendar -->
+      <!-- Contribution Chart -->
       <div class="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold">
-          <Calendar class="h-5 w-5 text-gray-500" />
-          Contribution Calendar
-        </h3>
-        <Chart options={getHeatmapOptions(stats.contributionsByDay, stats.year)} height="200px" />
+        <div class="mb-6 flex items-center justify-between">
+          <h3 class="text-lg font-bold">{m.home_contribution_activity()}</h3>
+          <div class="flex gap-2">
+            <!-- Year selector could go here -->
+          </div>
+        </div>
+        <div class="h-48 w-full">
+          <Chart options={getHeatmapOptions(stats.contributionsByDay, stats.year)} height="100%" />
+        </div>
       </div>
 
       <div class="grid gap-6 md:grid-cols-2">
@@ -427,7 +441,7 @@
         class="animate-in fade-in zoom-in w-full max-w-md overflow-hidden rounded-xl bg-white shadow-xl duration-200"
       >
         <div class="flex items-center justify-between border-b border-gray-100 p-4">
-          <h2 class="text-lg font-semibold">Settings</h2>
+          <h2 class="text-lg font-semibold">{m.settings_title()}</h2>
           <button
             onclick={() => (showSettings = false)}
             class="rounded-full p-1 transition-colors hover:bg-gray-100"
@@ -490,23 +504,23 @@
             class="space-y-4"
           >
             <div>
-              <label for="token" class="block text-sm font-medium text-gray-700 mb-1">GitHub Personal Access Token</label>
+              <label for="token" class="block text-sm font-medium text-gray-700 mb-1">{m.home_token_label()}</label>
               <input
                 type="password"
                 name="token"
                 id="token"
                 bind:value={token}
                 required
-                placeholder="ghp_..."
+                placeholder={m.home_enter_token_placeholder()}
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
               />
               <p class="mt-1 text-xs text-gray-500">
-                Token requires <code>read:user</code> scope. It is not stored on server.
+                {@html m.home_token_help()}
               </p>
             </div>
 
             <div>
-              <label for="year" class="mb-1 block text-sm font-medium text-gray-700">Year</label>
+              <label for="year" class="mb-1 block text-sm font-medium text-gray-700">{m.home_year()}</label>
               <input
                 type="number"
                 name="year"
@@ -525,16 +539,16 @@
                 class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
               />
               <label for="includePrivate" class="text-sm font-medium text-gray-700">
-                Include private repositories in report
+                {m.home_include_private()}
               </label>
             </div>
 
             <div class="space-y-3 border-t border-gray-100 pt-3">
-              <h3 class="text-sm font-semibold text-gray-900">Open Source Settings</h3>
+              <h3 class="text-sm font-semibold text-gray-900">{m.home_oss_settings_title()}</h3>
 
               <div>
                 <label for="ossMinStars" class="mb-1 block text-sm font-medium text-gray-700">
-                  Min Stars Threshold
+                  {m.home_oss_min_stars_threshold()}
                 </label>
                 <input
                   type="number"
@@ -545,7 +559,7 @@
                   class="w-full rounded-lg border border-gray-300 px-4 py-2 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-black"
                 />
                 <p class="mt-1 text-xs text-gray-500">
-                  Minimum stars for a repo to count as "Open Source" contribution.
+                  {m.home_oss_min_stars_help()}
                 </p>
               </div>
 
@@ -558,7 +572,7 @@
                   class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
                 />
                 <label for="ossIncludeOwn" class="text-sm font-medium text-gray-700">
-                  Include my own repositories
+                  {m.home_oss_include_own_label()}
                 </label>
               </div>
             </div>
@@ -575,9 +589,9 @@
               >
                 {#if loading}
                   <Loader2 class="h-4 w-4 animate-spin" />
-                  Generating...
+                  {m.home_generating_report()}
                 {:else}
-                  Generate Report
+                  {m.home_generate_report()}
                 {/if}
               </button>
             </div>

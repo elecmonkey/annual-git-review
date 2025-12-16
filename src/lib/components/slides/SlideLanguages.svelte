@@ -4,6 +4,7 @@
   import type { EChartsOption } from 'echarts';
   import { theme } from '$lib/theme.svelte';
   import { settings } from '$lib/settings.svelte';
+  import * as m from '$lib/paraglide/messages';
 
   let { stats } = $props<{ stats: GithubStats }>();
 
@@ -123,7 +124,7 @@
   let chartOptions = $derived(getLanguagePieOption(stats.topLanguages));
 </script>
 
-<h3 class="mb-4 text-2xl font-bold">Tech Stack</h3>
+<h3 class="mb-4 text-2xl font-bold">{m.top_languages_title()}</h3>
 <div class="mb-6 h-64 w-full">
   <Chart options={chartOptions} height="100%" />
 </div>

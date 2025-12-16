@@ -1,18 +1,19 @@
 <script lang="ts">
   import type { GithubStats } from '$lib/server/github';
   import { theme } from '$lib/theme.svelte';
+  import * as m from '$lib/paraglide/messages';
 
   let { stats } = $props<{ stats: GithubStats }>();
 
   function getQuote(commits: number) {
-    if (commits <= 10) return "Every great project starts with a single line of code. Keep exploring!";
-    if (commits <= 20) return "You're finding your rhythm. Every commit is a step forward in your journey.";
-    if (commits <= 50) return "Consistency builds mastery. You're planting seeds for the future.";
-    if (commits <= 100) return "Your code is taking shape. Keep building, keep learning, keep growing.";
-    if (commits <= 200) return "The world runs on code, and you're part of the engine. Keep pushing boundaries.";
-    if (commits <= 500) return "Creativity meets logic. You're turning ideas into reality, one commit at a time.";
-    if (commits <= 1000) return "Passion fuels progress. Your dedication to the craft is inspiring.";
-    return "The limit is your imagination. Continue to innovate and shape the digital world.";
+    if (commits <= 10) return m.quote_10();
+    if (commits <= 20) return m.quote_20();
+    if (commits <= 50) return m.quote_50();
+    if (commits <= 100) return m.quote_100();
+    if (commits <= 200) return m.quote_200();
+    if (commits <= 500) return m.quote_500();
+    if (commits <= 1000) return m.quote_1000();
+    return m.quote_max();
   }
 </script>
 

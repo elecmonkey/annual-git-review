@@ -3,13 +3,14 @@
   import { GitPullRequest, GitMerge, Star } from 'lucide-svelte';
   import { theme } from '$lib/theme.svelte';
   import { settings } from '$lib/settings.svelte';
+  import * as m from '$lib/paraglide/messages';
 
   let { stats } = $props<{ stats: GithubStats }>();
 
   let topOSS = $derived(stats.openSourceStats.projectStats.slice(0, settings.ossCount));
 </script>
 
-<h3 class="mb-6 text-2xl font-bold">Open Source Impact</h3>
+<h3 class="mb-6 text-2xl font-bold">{m.oss_title()}</h3>
 
 <div class="mb-8 grid grid-cols-2 gap-4 w-full">
   <div class="rounded-xl {theme.current.cardBg} p-4 backdrop-blur-md">

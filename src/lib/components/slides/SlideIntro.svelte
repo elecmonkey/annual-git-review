@@ -2,6 +2,7 @@
   import type { GithubStats } from '$lib/server/github';
   import { theme } from '$lib/theme.svelte';
   import { settings } from '$lib/settings.svelte';
+  import * as m from '$lib/paraglide/messages';
 
   let { stats } = $props<{ stats: GithubStats }>();
 
@@ -41,8 +42,8 @@
     class="mx-auto h-32 w-32 rounded-full border-4 shadow-lg {theme.current.border}"
   />
   <div>
-    <h2 class="mb-2 text-3xl font-bold">Hi, @{stats.user.login}</h2>
-    <p class="text-lg {theme.current.textSecondary}">Your {stats.year} GitHub Journey</p>
+    <h2 class="mb-2 text-3xl font-bold">{m.intro_hi({ name: stats.user.login })}</h2>
+    <p class="text-lg {theme.current.textSecondary}">{m.intro_journey({ year: stats.year })}</p>
   </div>
   <div
     class="{theme.current.accentGradient} bg-clip-text text-5xl font-black text-transparent"
@@ -52,12 +53,12 @@
       stats.totalReviewContributions +
       stats.totalIssueContributions}
   </div>
-  <p class="text-sm tracking-widest {theme.current.textMuted} uppercase">Total Contributions</p>
+  <p class="text-sm tracking-widest {theme.current.textMuted} uppercase">{m.intro_total_contributions()}</p>
 </div>
 
 {#if settings.showGreenWall}
   <div class="mt-8 w-[110%] px-4">
-    <div class="grid grid-flow-col grid-rows-7 gap-[1px] w-full" style="grid-template-columns: repeat(53, minmax(0, 1fr));">
+    <div class="grid grid-flow-col grid-rows-7 gap-px w-full" style="grid-template-columns: repeat(53, minmax(0, 1fr));">
       {#each contributionData as day}
         {#if day}
           <div
