@@ -194,12 +194,16 @@
           </a>
           <div class="flex items-center gap-4">
             <button
-              class="rounded-full bg-white px-3 py-2 shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center gap-2"
+              class="rounded-full bg-white px-3 py-2 shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center gap-1.5"
               onclick={() => switchLanguage(getLanguage() === 'en' ? 'zh-CN' : 'en')}
               aria-label="Switch Language"
             >
-              <Globe class="h-4 w-4 text-gray-600" />
-              <span class="text-sm font-medium text-gray-600">{getLanguage() === 'en' ? '中文' : 'EN'}</span>
+              <Globe class="h-4 w-4 text-gray-600 mr-0.5" />
+              <div class="flex items-baseline leading-none">
+                <span class={getLanguage() === 'en' ? 'text-sm font-bold text-gray-900' : 'text-xs font-medium text-gray-400'}>EN</span>
+                <span class="mx-0.5 text-xs text-gray-300">/</span>
+                <span class={getLanguage() === 'zh-CN' ? 'text-sm font-bold text-gray-900' : 'text-xs font-medium text-gray-400'}>中文</span>
+              </div>
             </button>
             <button
               class="rounded-full bg-white p-2 shadow-sm transition-transform hover:scale-105 active:scale-95"
