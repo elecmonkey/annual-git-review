@@ -1,6 +1,7 @@
 <script lang="ts">
   import { X } from 'lucide-svelte';
   import { fade, scale } from 'svelte/transition';
+  import { settings } from '$lib/settings.svelte';
 
   let { onClose } = $props<{ onClose: () => void }>();
 </script>
@@ -20,8 +21,60 @@
       </button>
     </div>
 
-    <div class="space-y-6 text-center text-white/60">
-      <p>More settings coming soon...</p>
+    <div class="space-y-6">
+      <!-- Language Count Setting -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">Tech Stack Count</h3>
+          <span class="text-sm font-bold text-white">{settings.languageCount}</span>
+        </div>
+        <input
+          type="range"
+          min="1"
+          max="10"
+          bind:value={settings.languageCount}
+          class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-emerald-500"
+        />
+        <p class="text-xs text-white/40">
+          Number of languages to show in badges and pie chart.
+        </p>
+      </div>
+
+      <!-- Repo Count Setting -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">Top Projects Count</h3>
+          <span class="text-sm font-bold text-white">{settings.repoCount}</span>
+        </div>
+        <input
+          type="range"
+          min="1"
+          max="6"
+          bind:value={settings.repoCount}
+          class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-emerald-500"
+        />
+        <p class="text-xs text-white/40">
+          Number of top repositories to display.
+        </p>
+      </div>
+
+      <!-- OSS Count Setting -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">Open Source Count</h3>
+          <span class="text-sm font-bold text-white">{settings.ossCount}</span>
+        </div>
+        <input
+          type="range"
+          min="1"
+          max="6"
+          bind:value={settings.ossCount}
+          class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-emerald-500"
+        />
+        <p class="text-xs text-white/40">
+          Number of open source contributions to display.
+        </p>
+      </div>
     </div>
   </div>
 </div>

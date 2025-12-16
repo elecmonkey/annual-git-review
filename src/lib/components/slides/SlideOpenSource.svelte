@@ -2,10 +2,11 @@
   import type { GithubStats } from '$lib/server/github';
   import { GitPullRequest, GitMerge, Star } from 'lucide-svelte';
   import { theme } from '$lib/theme.svelte';
+  import { settings } from '$lib/settings.svelte';
 
   let { stats } = $props<{ stats: GithubStats }>();
 
-  let topOSS = $derived(stats.openSourceStats.projectStats.slice(0, 3));
+  let topOSS = $derived(stats.openSourceStats.projectStats.slice(0, settings.ossCount));
 </script>
 
 <h3 class="mb-6 text-2xl font-bold">Open Source Impact</h3>

@@ -3,6 +3,7 @@
   import Chart from '../Chart.svelte';
   import type { EChartsOption } from 'echarts';
   import { theme } from '$lib/theme.svelte';
+  import { settings } from '$lib/settings.svelte';
 
   let { stats } = $props<{ stats: GithubStats }>();
 
@@ -88,24 +89,46 @@
           radius: ['40%', '70%'],
           center: ['50%', '50%'],
           itemStyle: { borderRadius: 8 },
-          label: { show: true, position: 'outside', formatter: '{b}', color: theme.current.chartColors.text },
+          label: {
+            show: true,
+            position: 'outside',
+            formatter: (params: any) => {
+              // Only show label if it's within the top N languages
+              return params.dataIndex < settings.languageCount ? params.name : '';
+            },
+            color: theme.current.chartColors.text
+          },
+          labelLine: {
+             show: true,
+             showAbove: true,
+             length: 15,
+             length2: 10,
+             smooth: true
+          },
           data: data.map((d) => ({
             value: d.count,
             name: d.name,
-            itemStyle: { color: d.color }
+            itemStyle: { color: d.color },
+            labelLine: { show: true } // Ensure lines are potentially shown
+          })).map((d, i) => ({
+              ...d,
+              label: { show: i < settings.languageCount },
+              labelLine: { show: i < settings.languageCount }
           }))
         }
       ]
     };
   }
+
+  let chartOptions = $derived(getLanguagePieOption(stats.topLanguages));
 </script>
 
 <h3 class="mb-4 text-2xl font-bold">Tech Stack</h3>
 <div class="mb-6 h-64 w-full">
-  <Chart options={getLanguagePieOption(stats.topLanguages)} height="100%" />
+  <Chart options={chartOptions} height="100%" />
 </div>
 <div class="flex flex-wrap justify-center gap-2">
-  {#each stats.topLanguages.slice(0, 3) as lang}
+  {#each stats.topLanguages.slice(0, settings.languageCount) as lang}
     <span
       class="rounded-full border {theme.current.border} {theme.current.cardBg} px-3 py-1 text-sm font-medium"
       style="color: {lang.color}"

@@ -1,13 +1,14 @@
 <script lang="ts">
   import type { GithubStats } from '$lib/server/github';
   import { theme } from '$lib/theme.svelte';
+  import { settings } from '$lib/settings.svelte';
 
   let { stats } = $props<{ stats: GithubStats }>();
 </script>
 
 <h3 class="mb-6 text-2xl font-bold">Top Projects</h3>
 <div class="w-full space-y-4 text-left">
-  {#each stats.topRepositories.slice(0, 4) as repo, i}
+  {#each stats.topRepositories.slice(0, settings.repoCount) as repo, i}
     <div
       class="flex items-center gap-4 rounded-xl border {theme.current.border} {theme.current.cardBg} p-4 backdrop-blur-sm"
     >
