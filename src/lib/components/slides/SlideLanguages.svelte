@@ -2,6 +2,7 @@
   import type { GithubStats } from '$lib/server/github';
   import Chart from '../Chart.svelte';
   import type { EChartsOption } from 'echarts';
+  import { theme } from '$lib/theme.svelte';
 
   let { stats } = $props<{ stats: GithubStats }>();
 
@@ -86,8 +87,8 @@
           type: 'pie',
           radius: ['40%', '70%'],
           center: ['50%', '50%'],
-          itemStyle: { borderRadius: 8, borderColor: '#1e293b', borderWidth: 2 },
-          label: { show: true, position: 'outside', formatter: '{b}', color: '#fff' },
+          itemStyle: { borderRadius: 8 },
+          label: { show: true, position: 'outside', formatter: '{b}', color: theme.current.chartColors.text },
           data: data.map((d) => ({
             value: d.count,
             name: d.name,
@@ -104,9 +105,9 @@
   <Chart options={getLanguagePieOption(stats.topLanguages)} height="100%" />
 </div>
 <div class="flex flex-wrap justify-center gap-2">
-  {#each stats.topLanguages.slice(0, 8) as lang}
+  {#each stats.topLanguages.slice(0, 3) as lang}
     <span
-      class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-sm font-medium"
+      class="rounded-full border {theme.current.border} {theme.current.cardBg} px-3 py-1 text-sm font-medium"
       style="color: {lang.color}"
     >
       {lang.name}
@@ -115,7 +116,7 @@
 </div>
 
 {#if topLangMessage}
-  <div class="mt-8 rounded-lg bg-white/5 p-4 text-center text-sm italic text-white/80 backdrop-blur-sm">
+  <div class="mt-8 rounded-lg {theme.current.cardBg} p-4 text-center text-sm italic {theme.current.textSecondary} backdrop-blur-sm">
     "{topLangMessage}"
   </div>
 {/if}

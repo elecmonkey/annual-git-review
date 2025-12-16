@@ -1,8 +1,10 @@
 <script lang="ts">
   import { fade, fly } from 'svelte/transition';
-  import { ChevronLeft, ChevronRight, X, Download } from 'lucide-svelte';
+  import { ChevronLeft, ChevronRight, X, Download, Settings } from 'lucide-svelte';
   import type { GithubStats } from '$lib/server/github';
   import { toPng } from 'html-to-image';
+  import { theme } from '$lib/theme.svelte';
+  import SettingsModal from './SettingsModal.svelte';
 
   // Import extracted slide components
   import SlideIntro from './slides/SlideIntro.svelte';
@@ -21,6 +23,7 @@
   const totalSlides = 6;
   let slideRef: HTMLElement | undefined = $state();
   let isDownloading = $state(false);
+  let showSettings = $state(false);
 
   function nextSlide() {
     if (currentSlide < totalSlides - 1) currentSlide++;
@@ -68,9 +71,17 @@
   </button>
 
   <button
+    onclick={() => (showSettings = true)}
+    class="absolute right-20 top-7 z-50 text-white/70 transition-all hover:text-white"
+    title="Settings"
+  >
+    <Settings size={28} />
+  </button>
+
+  <button
     onclick={downloadSlide}
     disabled={isDownloading}
-    class="absolute right-20 top-7 z-50 text-white/70 transition-all hover:text-white disabled:opacity-50"
+    class="absolute right-32 top-7 z-50 text-white/70 transition-all hover:text-white disabled:opacity-50"
     title="Download Slide"
   >
     <Download size={28} />
@@ -95,22 +106,22 @@
   <!-- Slide Container -->
   <div
     bind:this={slideRef}
-    class="relative aspect-[9/16] w-full max-w-md overflow-hidden bg-gradient-to-br from-slate-900 via-gray-900 to-slate-950 shadow-2xl"
+    class="relative aspect-[9/16] w-full max-w-md overflow-hidden shadow-2xl {theme.current.background} {theme.current.border}"
   >
     <!-- Background Decor -->
     <div class="pointer-events-none absolute inset-0 opacity-20">
       <div
-        class="absolute -left-[20%] -top-[20%] h-[50%] w-[80%] rounded-full bg-emerald-500 blur-[100px]"
+        class="absolute -left-[20%] -top-[20%] h-[50%] w-[80%] rounded-full blur-[100px] {theme.current.decorBlob1}"
       ></div>
       <div
-        class="absolute -bottom-[20%] -right-[20%] h-[50%] w-[80%] rounded-full bg-sky-600 blur-[100px]"
+        class="absolute -bottom-[20%] -right-[20%] h-[50%] w-[80%] rounded-full blur-[100px] {theme.current.decorBlob2}"
       ></div>
     </div>
 
     <!-- Content Area -->
     {#key currentSlide}
       <div
-        class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-white"
+        class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center {theme.current.textPrimary}"
         in:fly={{ y: 50, duration: 400, delay: 200 }}
         out:fade={{ duration: 200 }}
       >
@@ -142,4 +153,8 @@
       </div>
     {/each}
   </div>
+
+  {#if showSettings}
+    <SettingsModal onClose={() => (showSettings = false)} />
+  {/if}
 </div>
