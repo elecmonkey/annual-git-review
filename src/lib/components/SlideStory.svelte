@@ -18,6 +18,7 @@
   import SlideRepos from './slides/SlideRepos.svelte';
   import SlideOpenSource from './slides/SlideOpenSource.svelte';
   import SlideSummary from './slides/SlideSummary.svelte';
+  import SlideLateNight from './slides/SlideLateNight.svelte';
 
   let { stats, onClose } = $props<{
     stats: GithubStats;
@@ -25,7 +26,7 @@
   }>();
 
   let currentSlide = $state(0);
-  const totalSlides = 6;
+  let totalSlides = $state(7);
   let slideRef: HTMLElement | undefined = $state();
   let isDownloading = $state(false);
   let showTheme = $state(false);
@@ -69,6 +70,33 @@
     if (e.key === 'ArrowLeft') prevSlide();
     if (e.key === 'Escape') onClose();
   }
+
+  function computeLateNightRatio(s: GithubStats) {
+    const hours = s.commitHoursUTC || [];
+    if (hours.length === 0) return 0;
+    const offsetMinutes = -new Date().getTimezoneOffset();
+    let total = 0;
+    let night = 0;
+    for (let utcHour = 0; utcHour < hours.length; utcHour++) {
+      const count = hours[utcHour] || 0;
+      total += count;
+      let localMinutes = (utcHour * 60 + offsetMinutes) % (24 * 60);
+      if (localMinutes < 0) localMinutes += 24 * 60;
+      const localHour = Math.floor(localMinutes / 60);
+      if (localHour === 23 || localHour < 6) night += count;
+    }
+    if (total === 0) return 0;
+    return night / total;
+  }
+
+  let hasLateNight = $state(false);
+  $effect(() => {
+    const ratio = computeLateNightRatio(stats);
+    hasLateNight = ratio > 0.2;
+    totalSlides = hasLateNight ? 7 : 6;
+    if (!hasLateNight && currentSlide === 5) currentSlide = 5;
+    if (!hasLateNight && currentSlide > 5) currentSlide = 5;
+  });
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -156,7 +184,15 @@
         {:else if currentSlide === 4}
           <SlideOpenSource {stats} />
         {:else if currentSlide === 5}
-          <SlideSummary {stats} />
+          {#if hasLateNight}
+            <SlideLateNight {stats} />
+          {:else}
+            <SlideSummary {stats} />
+          {/if}
+        {:else if currentSlide === 6}
+          {#if hasLateNight}
+            <SlideSummary {stats} />
+          {/if}
         {/if}
       </div>
     {/key}

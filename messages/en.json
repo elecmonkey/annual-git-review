@@ -72,5 +72,7 @@
   "home_story_mode": "Story Mode",
   "home_banner_suffix": "and clone it to let your AI agent modify it for you!",
   "home_banner_intro": "Remember to check out Story Mode above!",
-  "home_banner_desc": "Want more diverse data or custom slide cards? Star our repository"
+  "home_banner_desc": "Want more diverse data or custom slide cards? Star our repository",
+  "slide_late_night_title": "Night Owl",
+  "slide_late_night_desc": "You made {count} commits between 23:00 and 06:00. The stars are watching!"
 }

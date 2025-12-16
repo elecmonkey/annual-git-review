@@ -45,6 +45,9 @@ interface CommitContributionsByRepository {
   repository: RepositoryNode;
   contributions: {
     totalCount: number;
+    nodes: {
+      occurredAt: string;
+    }[];
   };
 }
 
@@ -82,6 +85,7 @@ interface ContributionsCollection {
 }
 
 interface Viewer {
+  id: string;
   login: string;
   name: string | null;
   avatarUrl: string;
@@ -90,6 +94,21 @@ interface Viewer {
 
 interface GitHubQueryResponse {
   viewer: Viewer;
+}
+
+interface CommitHistory {
+  pageInfo: { hasNextPage: boolean; endCursor: string | null };
+  nodes: { committedDate: string }[];
+}
+
+interface RepoHistoryResponse {
+  repository?: {
+    defaultBranchRef?: {
+      target?: {
+        history?: CommitHistory;
+      };
+    };
+  };
 }
 
 // --- App Data Types ---
@@ -115,6 +134,7 @@ export interface GithubStats {
     count: number;
     topRepo?: string;
   };
+  commitHoursUTC: number[];
   topLanguages: {
     name: string;
     count: number;
@@ -192,9 +212,9 @@ export async function getGithubStats(
   const from = `${year}-01-01T00:00:00Z`;
   const to = `${year}-12-31T23:59:59Z`;
 
-  const query = `
-    query($from: DateTime!, $to: DateTime!) {
+  const queryBody = `
       viewer {
+        id
         login
         name
         avatarUrl
@@ -228,8 +248,11 @@ export async function getGithubStats(
                 color
               }
             }
-            contributions {
+            contributions(first: 100) {
               totalCount
+              nodes {
+                occurredAt
+              }
             }
           }
 
@@ -259,11 +282,13 @@ export async function getGithubStats(
           }
         }
       }
-    }
   `;
 
-  const data = await fetchGraphQL<GitHubQueryResponse>(token, query, { from, to });
-  const viewer = data.viewer;
+  const mainQuery = `query($from: DateTime!, $to: DateTime!) { ${queryBody} }`;
+
+  // Fetch Main Data (Full Year)
+  const mainData = await fetchGraphQL<GitHubQueryResponse>(token, mainQuery, { from, to });
+  const viewer = mainData.viewer;
   const collection = viewer.contributionsCollection;
 
   // Process Contributions by Day
@@ -271,6 +296,61 @@ export async function getGithubStats(
   let totalPullRequestContributions = collection.totalPullRequestContributions;
   let totalReviewContributions = collection.totalPullRequestReviewContributions;
   let totalIssueContributions = collection.totalIssueContributions;
+
+  const authorId = viewer.id;
+  const commitHoursUTC = new Array(24).fill(0);
+  const historyQuery = `
+    query($owner: String!, $name: String!, $authorId: ID!, $from: GitTimestamp!, $to: GitTimestamp!, $after: String) {
+      repository(owner: $owner, name: $name) {
+        defaultBranchRef {
+          target {
+            ... on Commit {
+              history(first: 100, author: {id: $authorId}, since: $from, until: $to, after: $after) {
+                pageInfo { hasNextPage endCursor }
+                nodes { committedDate }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  for (const item of collection.commitContributionsByRepository) {
+    const repo = item.repository;
+    if (!includePrivate && repo.isPrivate) continue;
+    const owner = repo.owner.login;
+    const name = repo.name;
+    let after: string | undefined = undefined;
+    while (true) {
+      let histData: RepoHistoryResponse | null = null;
+      try {
+        histData = await fetchGraphQL<RepoHistoryResponse>(
+          token,
+          historyQuery,
+          { owner, name, authorId, from, to, after }
+        );
+      } catch {
+        break;
+      }
+      const repoNode = histData?.repository;
+      const branch = repoNode?.defaultBranchRef;
+      const target = branch?.target as { history?: CommitHistory } | undefined;
+      const history = target?.history ?? null;
+      if (!history) break;
+      for (const node of history.nodes) {
+        const d = new Date(node.committedDate);
+        const h = d.getUTCHours();
+        commitHoursUTC[h]++;
+      }
+      if (history.pageInfo.hasNextPage && history.pageInfo.endCursor) {
+        after = history.pageInfo.endCursor || undefined;
+      } else {
+        break;
+      }
+    }
+  }
+
+
 
   if (!includePrivate) {
     // Recalculate Commits from Public Repos (Top 100)
@@ -418,18 +498,19 @@ export async function getGithubStats(
   return {
     user: {
       login: viewer.login,
-      name: viewer.name || viewer.login,
-      avatarUrl: viewer.avatarUrl
+      avatarUrl: viewer.avatarUrl,
+      name: viewer.name || viewer.login
     },
     year,
-    totalCommitContributions: totalCommitContributions,
-    totalPullRequestContributions: totalPullRequestContributions,
-    totalReviewContributions: totalReviewContributions,
-    totalIssueContributions: totalIssueContributions,
+    totalCommitContributions,
+    totalPullRequestContributions,
+    totalReviewContributions,
+    totalIssueContributions,
     contributionsByDay,
     peakDay: peakDayStats,
+    commitHoursUTC,
     topLanguages,
-    topRepositories: topRepositories.slice(0, 12), // Top 12
+    topRepositories: topRepositories.slice(0, 12),
     openSourceStats: {
       totalPrs,
       mergedPrs,
