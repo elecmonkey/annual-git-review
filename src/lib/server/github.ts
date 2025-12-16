@@ -298,7 +298,7 @@ export async function getGithubStats(
   let totalIssueContributions = collection.totalIssueContributions;
 
   const authorId = viewer.id;
-  const commitHoursUTC = new Array(24).fill(0);
+  const commitHoursUTC = Array.from<number>({ length: 24 }).fill(0);
   const historyQuery = `
     query($owner: String!, $name: String!, $authorId: ID!, $from: GitTimestamp!, $to: GitTimestamp!, $after: String) {
       repository(owner: $owner, name: $name) {

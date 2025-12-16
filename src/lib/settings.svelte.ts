@@ -7,7 +7,8 @@ const defaults = {
   repoCount: 4,
   ossCount: 3,
   showGreenWall: false,
-  showFooter: true
+  showFooter: true,
+  showSnow: true
 };
 
 let initialState = defaults;
