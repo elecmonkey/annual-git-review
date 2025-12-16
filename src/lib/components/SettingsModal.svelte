@@ -129,8 +129,9 @@
             ></div>
           </label>
         </div>
-        <p class="text-xs text-white/40">Toggle snowflakes on the summary slide.</p>
+        <p class="text-xs text-white/40">Toggle snowfall on the final slide.</p>
       </div>
+
     </div>
   </div>
 </div>

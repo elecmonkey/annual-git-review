@@ -19,6 +19,7 @@
   import SlideOpenSource from './slides/SlideOpenSource.svelte';
   import SlideSummary from './slides/SlideSummary.svelte';
   import SlideLateNight from './slides/SlideLateNight.svelte';
+  import SnowOverlay from './SnowOverlay.svelte';
 
   let { stats, onClose } = $props<{
     stats: GithubStats;
@@ -97,6 +98,10 @@
     if (!hasLateNight && currentSlide === 5) currentSlide = 5;
     if (!hasLateNight && currentSlide > 5) currentSlide = 5;
   });
+
+  let showSnowNow = $derived(
+    settings.showSnow && ((hasLateNight && currentSlide === 6) || (!hasLateNight && currentSlide === 5))
+  );
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -105,7 +110,6 @@
   class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm"
   transition:fade
 >
-  <!-- Controls -->
   <button onclick={onClose} class="absolute top-6 right-6 z-50 text-white/70 hover:text-white">
     <X size={32} />
   </button>
@@ -169,11 +173,15 @@
       ></div>
     </div>
 
+    {#if showSnowNow}
+      <SnowOverlay />
+    {/if}
+
     <!-- Content Area -->
     {#key currentSlide}
       <div
         class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center {theme
-          .current.textPrimary}"
+          .current.textPrimary} z-40"
         in:fly={{ y: 50, duration: 400, delay: 200 }}
         out:fade={{ duration: 200 }}
       >
