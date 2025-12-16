@@ -135,7 +135,18 @@ export const themes: Theme[] = [
   }
 ];
 
+import { browser } from '$app/environment';
+
+const STORAGE_KEY = 'git-review-theme';
+
 let _currentThemeId = $state('deep-space');
+
+if (browser) {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    _currentThemeId = stored;
+  }
+}
 
 export const theme = {
   get current() {
@@ -143,5 +154,8 @@ export const theme = {
   },
   set(id: string) {
     _currentThemeId = id;
+    if (browser) {
+      localStorage.setItem(STORAGE_KEY, id);
+    }
   }
 };

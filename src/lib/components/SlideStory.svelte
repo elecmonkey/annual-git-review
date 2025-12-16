@@ -4,6 +4,8 @@
   import type { GithubStats } from '$lib/server/github';
   import { toPng } from 'html-to-image';
   import { theme } from '$lib/theme.svelte';
+  import { settings } from '$lib/settings.svelte';
+  import { browser } from '$app/environment';
   import ThemeModal from './ThemeModal.svelte';
   import SettingsModal from './SettingsModal.svelte';
 
@@ -26,6 +28,12 @@
   let isDownloading = $state(false);
   let showTheme = $state(false);
   let showSettings = $state(false);
+
+  $effect(() => {
+    if (browser) {
+      localStorage.setItem('git-review-settings', JSON.stringify(settings));
+    }
+  });
 
   function nextSlide() {
     if (currentSlide < totalSlides - 1) currentSlide++;
