@@ -69,5 +69,8 @@
   "home_open_source_contributions": "开源贡献",
   "home_total_prs": "总 PR",
   "home_merged_prs": "已合并 PR",
-  "home_top_projects": "热门项目"
+  "home_top_projects": "热门项目",
+  "home_banner_suffix": "并且clone，让你的ai agent为你修改！",
+  "home_banner_intro": "记得点开上方的故事模式！",
+  "home_banner_desc": "是否希望更多样数据或者自定义幻灯片卡片？请star我们的仓库"
 }

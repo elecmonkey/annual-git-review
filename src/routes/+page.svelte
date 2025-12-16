@@ -31,6 +31,7 @@
   let includePrivate = $state(true);
   let ossMinStars = $state(0);
   let ossIncludeOwn = $state(true);
+  let showBanner = $state(true);
 
   // Initialize stats and token from localStorage or form data
   onMount(() => {
@@ -239,6 +240,30 @@
       </div>
     {:else}
       <!-- Report View -->
+
+      <!-- Promo Banner -->
+      {#if showBanner}
+        <div class="mb-6 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 p-4 text-amber-900 shadow-sm border border-amber-100 flex items-center gap-3 relative pr-8">
+          <Star class="h-5 w-5 text-amber-500 shrink-0" />
+          <p class="text-sm font-medium leading-relaxed">
+            {m.home_banner_intro()}
+            <br />
+            {m.home_banner_desc()}
+            <a href="https://github.com/elecmonkey/annual-git-review" target="_blank" class="font-semibold underline hover:text-amber-700 inline-flex items-center gap-1 translate-y-[3px]">
+              <GithubIcon class="h-4 w-4" />
+              @elecmonkey/annual-git-review
+            </a>
+            {m.home_banner_suffix()}
+          </p>
+          <button
+            class="absolute top-1/2 -translate-y-1/2 right-2 p-1 text-amber-800/60 hover:text-amber-900 hover:bg-amber-100/50 rounded-full transition-colors cursor-pointer"
+            onclick={() => (showBanner = false)}
+            aria-label="Close"
+          >
+            <X class="h-4 w-4" />
+          </button>
+        </div>
+      {/if}
 
       <!-- Profile Section -->
       <div

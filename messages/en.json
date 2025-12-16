@@ -69,5 +69,8 @@
   "home_total_prs": "Total PRs",
   "home_merged_prs": "Merged PRs",
   "home_top_projects": "Top Projects",
-  "home_story_mode": "Story Mode"
+  "home_story_mode": "Story Mode",
+  "home_banner_suffix": "and clone it to let your AI agent modify it for you!",
+  "home_banner_intro": "Remember to check out Story Mode above!",
+  "home_banner_desc": "Want more diverse data or custom slide cards? Star our repository"
 }
