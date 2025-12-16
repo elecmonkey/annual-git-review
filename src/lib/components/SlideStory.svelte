@@ -106,13 +106,13 @@
   transition:fade
 >
   <!-- Controls -->
-  <button onclick={onClose} class="absolute right-6 top-6 z-50 text-white/70 hover:text-white">
+  <button onclick={onClose} class="absolute top-6 right-6 z-50 text-white/70 hover:text-white">
     <X size={32} />
   </button>
 
   <button
     onclick={() => (showSettings = true)}
-    class="absolute right-20 top-7 z-50 text-white/70 transition-all hover:text-white"
+    class="absolute top-7 right-20 z-50 text-white/70 transition-all hover:text-white"
     title="Settings"
   >
     <Settings size={28} />
@@ -120,7 +120,7 @@
 
   <button
     onclick={() => (showTheme = true)}
-    class="absolute right-32 top-7 z-50 text-white/70 transition-all hover:text-white"
+    class="absolute top-7 right-32 z-50 text-white/70 transition-all hover:text-white"
     title="Change Theme"
   >
     <Palette size={28} />
@@ -129,7 +129,7 @@
   <button
     onclick={downloadSlide}
     disabled={isDownloading}
-    class="absolute right-44 top-7 z-50 text-white/70 transition-all hover:text-white disabled:opacity-50"
+    class="absolute top-7 right-44 z-50 text-white/70 transition-all hover:text-white disabled:opacity-50"
     title="Download Slide"
   >
     <Download size={28} />
@@ -154,22 +154,26 @@
   <!-- Slide Container -->
   <div
     bind:this={slideRef}
-    class="relative aspect-9/16 w-full max-w-md overflow-hidden shadow-2xl {theme.current.background} {theme.current.border}"
+    class="relative aspect-9/16 w-full max-w-md overflow-hidden shadow-2xl {theme.current
+      .background} {theme.current.border}"
   >
     <!-- Background Decor -->
     <div class="pointer-events-none absolute inset-0 opacity-20">
       <div
-        class="absolute -left-[20%] -top-[20%] h-[50%] w-[80%] rounded-full blur-[100px] {theme.current.decorBlob1}"
+        class="absolute -top-[20%] -left-[20%] h-[50%] w-[80%] rounded-full blur-[100px] {theme
+          .current.decorBlob1}"
       ></div>
       <div
-        class="absolute -bottom-[20%] -right-[20%] h-[50%] w-[80%] rounded-full blur-[100px] {theme.current.decorBlob2}"
+        class="absolute -right-[20%] -bottom-[20%] h-[50%] w-[80%] rounded-full blur-[100px] {theme
+          .current.decorBlob2}"
       ></div>
     </div>
 
     <!-- Content Area -->
     {#key currentSlide}
       <div
-        class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center {theme.current.textPrimary}"
+        class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center {theme
+          .current.textPrimary}"
         in:fly={{ y: 50, duration: 400, delay: 200 }}
         out:fade={{ duration: 200 }}
       >
@@ -198,10 +202,17 @@
     {/key}
 
     {#if settings.showFooter}
-      <div class="absolute bottom-4 left-0 w-full text-center text-[12px] opacity-40 {theme.current.textMuted} flex items-center justify-center gap-1.5">
+      <div
+        class="absolute bottom-4 left-0 w-full text-center text-[12px] opacity-40 {theme.current
+          .textMuted} flex items-center justify-center gap-1.5"
+      >
         <span>{m.generated_by()}</span>
-        <GithubIcon class="w-4 h-4" />
-        <a class="font-semibold" href="https://github.com/elecmonkey/annual-git-review" target="_blank">annual-git-review</a>
+        <GithubIcon class="h-4 w-4" />
+        <a
+          class="font-semibold"
+          href="https://github.com/elecmonkey/annual-git-review"
+          target="_blank">annual-git-review</a
+        >
       </div>
     {/if}
   </div>

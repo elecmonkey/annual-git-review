@@ -65,10 +65,7 @@
     }
   });
 
-  function getHeatmapOptions(
-    data: { date: string; count: number }[],
-    year: number
-  ): EChartsOption {
+  function getHeatmapOptions(data: { date: string; count: number }[], year: number): EChartsOption {
     const heatmapData = data.map((item) => [item.date, item.count]);
     const max = Math.max(...data.map((d) => d.count), 5);
 
@@ -167,56 +164,79 @@
 </script>
 
 <div class="min-h-screen bg-gray-50 pb-10 font-sans text-gray-900">
-    <!-- Header -->
-    <header class="sticky top-0 z-10 mb-8 border-b border-gray-200 bg-white py-6 shadow-sm">
-      <div class="mx-auto flex max-w-6xl items-center justify-between px-4">
-        <div class="flex items-center gap-3">
-          <Github class="h-8 w-8" />
-          <h1 class="text-2xl font-bold tracking-tight">Annual Git Review</h1>
-        </div>
-        <div class="flex items-center gap-2">
-          {#if stats}
-            <button
-              onclick={() => (showStory = true)}
-              class="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><path d="m9 16 6-6"/></svg>
-              {m.home_story_mode()}
-            </button>
-          {/if}
-          <a
-            href="https://github.com/elecmonkey/annual-git-review"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
-            aria-label="View on GitHub"
+  <!-- Header -->
+  <header class="sticky top-0 z-10 mb-8 border-b border-gray-200 bg-white py-6 shadow-sm">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <Github class="h-8 w-8" />
+        <h1 class="text-2xl font-bold tracking-tight">Annual Git Review</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        {#if stats}
+          <button
+            onclick={() => (showStory = true)}
+            class="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
           >
-            <GithubIcon class="h-6 w-6" />
-          </a>
-          <div class="flex items-center gap-4">
-            <button
-              class="rounded-full bg-white px-3 py-2 shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center gap-1.5"
-              onclick={() => switchLanguage(getLanguage() === 'en' ? 'zh-CN' : 'en')}
-              aria-label="Switch Language"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><line
+                x1="3"
+                x2="21"
+                y1="9"
+                y2="9"
+              /><path d="m9 16 6-6" /></svg
             >
-              <Globe class="h-4 w-4 text-gray-600 mr-0.5" />
-              <div class="flex items-baseline leading-none">
-                <span class={getLanguage() === 'en' ? 'text-sm font-bold text-gray-900' : 'text-xs font-medium text-gray-400'}>EN</span>
-                <span class="mx-0.5 text-xs text-gray-300">/</span>
-                <span class={getLanguage() === 'zh-CN' ? 'text-sm font-bold text-gray-900' : 'text-xs font-medium text-gray-400'}>中文</span>
-              </div>
-            </button>
-            <button
-              class="rounded-full bg-white p-2 shadow-sm transition-transform hover:scale-105 active:scale-95"
-              onclick={() => (showSettings = true)}
-              aria-label="Settings"
-            >
-              <Settings class="h-6 w-6 text-gray-600" />
-            </button>
-          </div>
+            {m.home_story_mode()}
+          </button>
+        {/if}
+        <a
+          href="https://github.com/elecmonkey/annual-git-review"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
+          aria-label="View on GitHub"
+        >
+          <GithubIcon class="h-6 w-6" />
+        </a>
+        <div class="flex items-center gap-4">
+          <button
+            class="flex items-center gap-1.5 rounded-full bg-white px-3 py-2 shadow-sm transition-transform hover:scale-105 active:scale-95"
+            onclick={() => switchLanguage(getLanguage() === 'en' ? 'zh-CN' : 'en')}
+            aria-label="Switch Language"
+          >
+            <Globe class="mr-0.5 h-4 w-4 text-gray-600" />
+            <div class="flex items-baseline leading-none">
+              <span
+                class={getLanguage() === 'en'
+                  ? 'text-sm font-bold text-gray-900'
+                  : 'text-xs font-medium text-gray-400'}>EN</span
+              >
+              <span class="mx-0.5 text-xs text-gray-300">/</span>
+              <span
+                class={getLanguage() === 'zh-CN'
+                  ? 'text-sm font-bold text-gray-900'
+                  : 'text-xs font-medium text-gray-400'}>中文</span
+              >
+            </div>
+          </button>
+          <button
+            class="rounded-full bg-white p-2 shadow-sm transition-transform hover:scale-105 active:scale-95"
+            onclick={() => (showSettings = true)}
+            aria-label="Settings"
+          >
+            <Settings class="h-6 w-6 text-gray-600" />
+          </button>
         </div>
       </div>
-    </header>
+    </div>
+  </header>
 
   <main class="mx-auto max-w-6xl px-4">
     {#if !stats}
@@ -243,20 +263,26 @@
 
       <!-- Promo Banner -->
       {#if showBanner}
-        <div class="mb-6 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 p-4 text-amber-900 shadow-sm border border-amber-100 flex items-center gap-3 relative pr-8">
-          <Star class="h-5 w-5 text-amber-500 shrink-0" />
-          <p class="text-sm font-medium leading-relaxed">
+        <div
+          class="relative mb-6 flex items-center gap-3 rounded-xl border border-amber-100 bg-gradient-to-r from-amber-50 to-orange-50 p-4 pr-8 text-amber-900 shadow-sm"
+        >
+          <Star class="h-5 w-5 shrink-0 text-amber-500" />
+          <p class="text-sm leading-relaxed font-medium">
             {m.home_banner_intro()}
             <br />
             {m.home_banner_desc()}
-            <a href="https://github.com/elecmonkey/annual-git-review" target="_blank" class="font-semibold underline hover:text-amber-700 inline-flex items-center gap-1 translate-y-[3px]">
+            <a
+              href="https://github.com/elecmonkey/annual-git-review"
+              target="_blank"
+              class="inline-flex translate-y-[3px] items-center gap-1 font-semibold underline hover:text-amber-700"
+            >
               <GithubIcon class="h-4 w-4" />
               @elecmonkey/annual-git-review
             </a>
             {m.home_banner_suffix()}
           </p>
           <button
-            class="absolute top-1/2 -translate-y-1/2 right-2 p-1 text-amber-800/60 hover:text-amber-900 hover:bg-amber-100/50 rounded-full transition-colors cursor-pointer"
+            class="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-full p-1 text-amber-800/60 transition-colors hover:bg-amber-100/50 hover:text-amber-900"
             onclick={() => (showBanner = false)}
             aria-label="Close"
           >
@@ -384,22 +410,30 @@
           <div class="grid gap-4 md:grid-cols-3">
             <!-- Summary Cards -->
             <div class="flex flex-col gap-4">
-              <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-blue-50/50 p-4">
+              <div
+                class="flex items-center gap-4 rounded-xl border border-gray-100 bg-blue-50/50 p-4"
+              >
                 <div class="rounded-lg bg-blue-100 p-3 text-blue-600">
                   <GitPullRequest class="h-6 w-6" />
                 </div>
                 <div>
-                  <div class="text-2xl font-bold text-gray-900">{stats.openSourceStats.totalPrs}</div>
+                  <div class="text-2xl font-bold text-gray-900">
+                    {stats.openSourceStats.totalPrs}
+                  </div>
                   <div class="text-sm font-medium text-gray-500">{m.home_total_prs()}</div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-purple-50/50 p-4">
+              <div
+                class="flex items-center gap-4 rounded-xl border border-gray-100 bg-purple-50/50 p-4"
+              >
                 <div class="rounded-lg bg-purple-100 p-3 text-purple-600">
                   <GitMerge class="h-6 w-6" />
                 </div>
                 <div>
-                  <div class="text-2xl font-bold text-gray-900">{stats.openSourceStats.mergedPrs}</div>
+                  <div class="text-2xl font-bold text-gray-900">
+                    {stats.openSourceStats.mergedPrs}
+                  </div>
                   <div class="text-sm font-medium text-gray-500">{m.home_merged_prs()}</div>
                 </div>
               </div>
@@ -407,7 +441,9 @@
 
             <!-- Top Projects List -->
             <div class="rounded-xl border border-gray-100 bg-gray-50 p-4 md:col-span-2">
-              <h4 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">{m.home_top_projects()}</h4>
+              <h4 class="mb-3 text-sm font-semibold tracking-wider text-gray-500 uppercase">
+                {m.home_top_projects()}
+              </h4>
               <div class="space-y-3">
                 {#each stats.openSourceStats.projectStats.slice(0, 5) as project}
                   <div class="flex items-center justify-between rounded-lg bg-white p-3 shadow-sm">
@@ -422,18 +458,22 @@
                           href={project.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="flex items-center gap-1 font-medium hover:underline hover:text-blue-600"
+                          class="flex items-center gap-1 font-medium hover:text-blue-600 hover:underline"
                         >
                           {project.owner}/{project.name}
                           <ExternalLink class="h-3 w-3 opacity-50" />
                         </a>
                         <div class="flex items-center gap-2 text-xs text-gray-500">
                           <span class="flex items-center gap-1">
-                            <Star class="h-3 w-3" /> {project.stars}
+                            <Star class="h-3 w-3" />
+                            {project.stars}
                           </span>
                           {#if project.language}
                             <span class="flex items-center gap-1">
-                              <span class="h-2 w-2 rounded-full" style="background-color: {project.languageColor}"></span>
+                              <span
+                                class="h-2 w-2 rounded-full"
+                                style="background-color: {project.languageColor}"
+                              ></span>
                               {project.language}
                             </span>
                           {/if}
@@ -443,9 +483,11 @@
                     <div class="text-right">
                       <div class="flex flex-row gap-1">
                         <div class="text-sm font-bold">{project.prsCount} PRs</div>
-                        <div class="text-sm font-bold text-green-600">{project.mergedCount} merged</div>
+                        <div class="text-sm font-bold text-green-600">
+                          {project.mergedCount} merged
+                        </div>
                       </div>
-                      <div class="text-xs font-mono">
+                      <div class="font-mono text-xs">
                         <span class="text-green-600">+{project.additions}</span>
                         <span class="text-red-600">-{project.deletions}</span>
                       </div>
@@ -532,7 +574,9 @@
             class="space-y-4"
           >
             <div>
-              <label for="token" class="block text-sm font-medium text-gray-700 mb-1">{m.home_token_label()}</label>
+              <label for="token" class="mb-1 block text-sm font-medium text-gray-700"
+                >{m.home_token_label()}</label
+              >
               <input
                 type="password"
                 name="token"
@@ -540,7 +584,7 @@
                 bind:value={token}
                 required
                 placeholder={m.home_enter_token_placeholder()}
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
+                class="w-full rounded-lg border border-gray-300 px-4 py-2 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-black"
               />
               <p class="mt-1 text-xs text-gray-500">
                 {@html m.home_token_help()}
@@ -548,7 +592,9 @@
             </div>
 
             <div>
-              <label for="year" class="mb-1 block text-sm font-medium text-gray-700">{m.home_year()}</label>
+              <label for="year" class="mb-1 block text-sm font-medium text-gray-700"
+                >{m.home_year()}</label
+              >
               <input
                 type="number"
                 name="year"

@@ -1,5 +1,5 @@
-import { overwriteGetLocale, locales, baseLocale } from "$lib/paraglide/runtime";
-import { browser } from "$app/environment";
+import { overwriteGetLocale, locales, baseLocale } from '$lib/paraglide/runtime';
+import { browser } from '$app/environment';
 
 // Define the type for supported languages based on the imported locales
 // We assume locales is a constant array like ["en", "zh-CN"]
@@ -15,17 +15,17 @@ overwriteGetLocale(() => _lang);
 export function initI18n() {
   if (!browser) return;
 
-  const storedLang = localStorage.getItem("lang");
+  const storedLang = localStorage.getItem('lang');
   console.log('[i18n] init, stored:', storedLang);
   if (isValidLanguage(storedLang)) {
     _lang = storedLang;
   } else {
     const browserLang = navigator.language;
     console.log('[i18n] browser:', browserLang);
-    if (browserLang.startsWith("zh") && (locales as readonly string[]).includes("zh-CN")) {
-      _lang = "zh-CN" as Language;
+    if (browserLang.startsWith('zh') && (locales as readonly string[]).includes('zh-CN')) {
+      _lang = 'zh-CN' as Language;
     } else {
-      _lang = "en" as Language;
+      _lang = 'en' as Language;
     }
   }
   console.log('[i18n] initial lang:', _lang);
@@ -39,7 +39,7 @@ export function switchLanguage(lang: string) {
   }
   _lang = lang;
   if (browser) {
-    localStorage.setItem("lang", lang);
+    localStorage.setItem('lang', lang);
   }
 }
 

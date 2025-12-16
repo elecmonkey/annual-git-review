@@ -324,11 +324,14 @@ export async function getGithubStats(
     while (true) {
       let histData: RepoHistoryResponse | null = null;
       try {
-        histData = await fetchGraphQL<RepoHistoryResponse>(
-          token,
-          historyQuery,
-          { owner, name, authorId, from, to, after }
-        );
+        histData = await fetchGraphQL<RepoHistoryResponse>(token, historyQuery, {
+          owner,
+          name,
+          authorId,
+          from,
+          to,
+          after
+        });
       } catch {
         break;
       }
@@ -349,8 +352,6 @@ export async function getGithubStats(
       }
     }
   }
-
-
 
   if (!includePrivate) {
     // Recalculate Commits from Public Repos (Top 100)

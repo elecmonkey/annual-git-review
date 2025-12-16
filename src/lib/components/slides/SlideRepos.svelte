@@ -11,7 +11,8 @@
 <div class="w-full space-y-4 text-left">
   {#each stats.topRepositories.slice(0, settings.repoCount) as repo, i}
     <div
-      class="flex items-center gap-4 rounded-xl border {theme.current.border} {theme.current.cardBg} p-4 backdrop-blur-sm"
+      class="flex items-center gap-4 rounded-xl border {theme.current.border} {theme.current
+        .cardBg} p-4 backdrop-blur-sm"
     >
       <div class="text-2xl font-black opacity-30">#{i + 1}</div>
       <div class="min-w-0 flex-1">

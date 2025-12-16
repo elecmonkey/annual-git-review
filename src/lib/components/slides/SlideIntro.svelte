@@ -45,28 +45,31 @@
     <h2 class="mb-2 text-3xl font-bold">{m.intro_hi({ name: stats.user.login })}</h2>
     <p class="text-lg {theme.current.textSecondary}">{m.intro_journey({ year: stats.year })}</p>
   </div>
-  <div
-    class="{theme.current.accentGradient} bg-clip-text text-5xl font-black text-transparent"
-  >
+  <div class="{theme.current.accentGradient} bg-clip-text text-5xl font-black text-transparent">
     {stats.totalCommitContributions +
       stats.totalPullRequestContributions +
       stats.totalReviewContributions +
       stats.totalIssueContributions}
   </div>
-  <p class="text-sm tracking-widest {theme.current.textMuted} uppercase">{m.intro_total_contributions()}</p>
+  <p class="text-sm tracking-widest {theme.current.textMuted} uppercase">
+    {m.intro_total_contributions()}
+  </p>
 </div>
 
 {#if settings.showGreenWall}
   <div class="mt-8 w-[110%] px-4">
-    <div class="grid grid-flow-col grid-rows-7 gap-px w-full" style="grid-template-columns: repeat(53, minmax(0, 1fr));">
+    <div
+      class="grid w-full grid-flow-col grid-rows-7 gap-px"
+      style="grid-template-columns: repeat(53, minmax(0, 1fr));"
+    >
       {#each contributionData as day}
         {#if day}
           <div
-            class="w-full aspect-square rounded-[1px] {getLevelColor(day.level)}"
+            class="aspect-square w-full rounded-[1px] {getLevelColor(day.level)}"
             title="{day.date}: {day.count} contributions"
           ></div>
         {:else}
-          <div class="w-full aspect-square bg-transparent"></div>
+          <div class="aspect-square w-full bg-transparent"></div>
         {/if}
       {/each}
     </div>

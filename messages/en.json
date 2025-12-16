@@ -74,5 +74,6 @@
   "home_banner_intro": "Remember to check out Story Mode above!",
   "home_banner_desc": "Want more diverse data or custom slide cards? Star our repository",
   "slide_late_night_title": "Night Owl",
-  "slide_late_night_desc": "You made {count} commits between 23:00 and 06:00. The stars are watching!"
+  "slide_late_night_desc": "You made {count} commits between 23:00 and 06:00. The stars are watching!",
+  "summary_new_year_motto": "In the new year, stay passionate and keep delivering."
 }
