@@ -16,6 +16,12 @@ export type Theme = {
     text: string;
     border: string;
   };
+  contributionColors: {
+    q1: string; // FIRST_QUARTILE
+    q2: string; // SECOND_QUARTILE
+    q3: string; // THIRD_QUARTILE
+    q4: string; // FOURTH_QUARTILE
+  };
 };
 
 export const themes: Theme[] = [
@@ -36,6 +42,12 @@ export const themes: Theme[] = [
     chartColors: {
       text: '#fff',
       border: '#1e293b'
+    },
+    contributionColors: {
+      q1: 'bg-emerald-900',
+      q2: 'bg-emerald-700',
+      q3: 'bg-emerald-500',
+      q4: 'bg-emerald-300'
     }
   },
   {
@@ -55,6 +67,12 @@ export const themes: Theme[] = [
     chartColors: {
       text: '#fde047',
       border: '#4a044e'
+    },
+    contributionColors: {
+      q1: 'bg-pink-900',
+      q2: 'bg-pink-700',
+      q3: 'bg-pink-500',
+      q4: 'bg-yellow-300'
     }
   },
   {
@@ -74,6 +92,12 @@ export const themes: Theme[] = [
     chartColors: {
       text: '#fef3c7',
       border: '#064e3b'
+    },
+    contributionColors: {
+      q1: 'bg-green-900',
+      q2: 'bg-lime-700',
+      q3: 'bg-lime-500',
+      q4: 'bg-yellow-300'
     }
   },
   {
@@ -93,6 +117,12 @@ export const themes: Theme[] = [
     chartColors: {
       text: '#fff',
       border: '#881337'
+    },
+    contributionColors: {
+      q1: 'bg-rose-900',
+      q2: 'bg-rose-700',
+      q3: 'bg-orange-500',
+      q4: 'bg-yellow-300'
     }
   },
   {
@@ -112,6 +142,12 @@ export const themes: Theme[] = [
     chartColors: {
       text: '#ecfeff',
       border: '#1e3a8a'
+    },
+    contributionColors: {
+      q1: 'bg-blue-900',
+      q2: 'bg-blue-700',
+      q3: 'bg-cyan-500',
+      q4: 'bg-cyan-300'
     }
   },
   {
@@ -131,6 +167,12 @@ export const themes: Theme[] = [
     chartColors: {
       text: '#fff',
       border: '#404040'
+    },
+    contributionColors: {
+      q1: 'bg-gray-800',
+      q2: 'bg-gray-600',
+      q3: 'bg-gray-400',
+      q4: 'bg-white'
     }
   }
 ];

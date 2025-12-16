@@ -5,7 +5,8 @@ const STORAGE_KEY = 'git-review-settings';
 const defaults = {
   languageCount: 3,
   repoCount: 4,
-  ossCount: 3
+  ossCount: 3,
+  showGreenWall: true
 };
 
 let initialState = defaults;

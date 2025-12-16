@@ -75,6 +75,22 @@
           Number of open source contributions to display.
         </p>
       </div>
+
+      <!-- Show Green Wall Setting -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-white/50">Contribution Graph</h3>
+          <label class="relative inline-flex cursor-pointer items-center">
+            <input type="checkbox" bind:checked={settings.showGreenWall} class="peer sr-only" />
+            <div
+              class="h-6 w-11 rounded-full bg-white/10 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-500 peer-checked:after:translate-x-full peer-focus:outline-none"
+            ></div>
+          </label>
+        </div>
+        <p class="text-xs text-white/40">
+          Show GitHub contribution calendar on the intro slide.
+        </p>
+      </div>
     </div>
   </div>
 </div>

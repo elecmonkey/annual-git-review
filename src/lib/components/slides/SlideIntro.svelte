@@ -1,8 +1,37 @@
 <script lang="ts">
   import type { GithubStats } from '$lib/server/github';
   import { theme } from '$lib/theme.svelte';
+  import { settings } from '$lib/settings.svelte';
 
   let { stats } = $props<{ stats: GithubStats }>();
+
+  function getLevelColor(level: string) {
+    switch (level) {
+      case 'FOURTH_QUARTILE':
+        return theme.current.contributionColors.q4;
+      case 'THIRD_QUARTILE':
+        return theme.current.contributionColors.q3;
+      case 'SECOND_QUARTILE':
+        return theme.current.contributionColors.q2;
+      case 'FIRST_QUARTILE':
+        return theme.current.contributionColors.q1;
+      default:
+        return 'bg-white/10';
+    }
+  }
+
+  // Calculate padding for correct day alignment (GitHub graph starts on Sunday)
+  let contributionData = $derived.by(() => {
+    if (!stats.contributionsByDay.length) return [];
+
+    const firstDay = new Date(stats.contributionsByDay[0].date);
+    const dayOfWeek = firstDay.getUTCDay(); // 0 = Sunday (Use UTC to avoid timezone shifts)
+
+    // Create padding array for the start
+    const startPadding = Array(dayOfWeek).fill(null);
+
+    return [...startPadding, ...stats.contributionsByDay];
+  });
 </script>
 
 <div class="space-y-6">
@@ -25,3 +54,20 @@
   </div>
   <p class="text-sm tracking-widest {theme.current.textMuted} uppercase">Total Contributions</p>
 </div>
+
+{#if settings.showGreenWall}
+  <div class="mt-8 w-[110%] px-4">
+    <div class="grid grid-flow-col grid-rows-7 gap-[1px] w-full" style="grid-template-columns: repeat(53, minmax(0, 1fr));">
+      {#each contributionData as day}
+        {#if day}
+          <div
+            class="w-full aspect-square rounded-[1px] {getLevelColor(day.level)}"
+            title="{day.date}: {day.count} contributions"
+          ></div>
+        {:else}
+          <div class="w-full aspect-square bg-transparent"></div>
+        {/if}
+      {/each}
+    </div>
+  </div>
+{/if}
