@@ -14,6 +14,9 @@ importers:
       echarts:
         specifier: ^6.0.0
         version: 6.0.0
+      html-to-image:
+        specifier: ^1.11.13
+        version: 1.11.13
       lucide-svelte:
         specifier: ^0.561.0
         version: 0.561.0(svelte@5.46.0)
@@ -1076,6 +1079,9 @@ packages:
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
+
+  html-to-image@1.11.13:
+    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
 
   https-proxy-agent@7.0.6:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
@@ -2593,6 +2599,8 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   has-flag@4.0.0: {}
+
+  html-to-image@1.11.13: {}
 
   https-proxy-agent@7.0.6:
     dependencies:
