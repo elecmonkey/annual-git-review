@@ -6,7 +6,8 @@ const defaults = {
   languageCount: 3,
   repoCount: 4,
   ossCount: 3,
-  showGreenWall: true
+  showGreenWall: false,
+  showFooter: true
 };
 
 let initialState = defaults;
