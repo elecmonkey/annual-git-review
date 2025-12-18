@@ -16,6 +16,7 @@
   import SlideActivity from './slides/SlideActivity.svelte';
   import SlideLanguages from './slides/SlideLanguages.svelte';
   import SlideRepos from './slides/SlideRepos.svelte';
+  import SlideCommunity from './slides/SlideCommunity.svelte';
   import SlideOpenSource from './slides/SlideOpenSource.svelte';
   import SlideSummary from './slides/SlideSummary.svelte';
   import SlideLateNight from './slides/SlideLateNight.svelte';
@@ -27,7 +28,7 @@
   }>();
 
   let currentSlide = $state(0);
-  let totalSlides = $state(7);
+  let totalSlides = $state(8);
   let slideRef: HTMLElement | undefined = $state();
   let isDownloading = $state(false);
   let showTheme = $state(false);
@@ -94,13 +95,14 @@
   $effect(() => {
     const ratio = computeLateNightRatio(stats);
     hasLateNight = ratio > 0.2;
-    totalSlides = hasLateNight ? 7 : 6;
-    if (!hasLateNight && currentSlide === 5) currentSlide = 5;
-    if (!hasLateNight && currentSlide > 5) currentSlide = 5;
+    totalSlides = hasLateNight ? 8 : 7;
+    if (!hasLateNight && currentSlide === 6) currentSlide = 6;
+    if (!hasLateNight && currentSlide > 6) currentSlide = 6;
   });
 
   let showSnowNow = $derived(
-    settings.showSnow && ((hasLateNight && currentSlide === 6) || (!hasLateNight && currentSlide === 5))
+    settings.showSnow &&
+      ((hasLateNight && currentSlide === 7) || (!hasLateNight && currentSlide === 6))
   );
 </script>
 
@@ -194,14 +196,16 @@
         {:else if currentSlide === 3}
           <SlideRepos {stats} />
         {:else if currentSlide === 4}
-          <SlideOpenSource {stats} />
+          <SlideCommunity {stats} />
         {:else if currentSlide === 5}
+          <SlideOpenSource {stats} />
+        {:else if currentSlide === 6}
           {#if hasLateNight}
             <SlideLateNight {stats} />
           {:else}
             <SlideSummary {stats} />
           {/if}
-        {:else if currentSlide === 6}
+        {:else if currentSlide === 7}
           {#if hasLateNight}
             <SlideSummary {stats} />
           {/if}

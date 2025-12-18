@@ -54,6 +54,14 @@
   <p class="text-sm tracking-widest {theme.current.textMuted} uppercase">
     {m.intro_total_contributions()}
   </p>
+  <div class="flex flex-wrap items-center justify-center gap-2">
+    <div class="chip {theme.current.cardBg} {theme.current.border}">
+      <span class="label {theme.current.textMuted}">{m.intro_new_repos()}</span>
+      <span class="value {theme.current.textPrimary}">
+        {(stats.reposCreatedThisYear ?? 0).toLocaleString()}
+      </span>
+    </div>
+  </div>
 </div>
 
 {#if settings.showGreenWall}
@@ -75,3 +83,23 @@
     </div>
   </div>
 {/if}
+
+<style>
+  .chip {
+    border-width: 1px;
+    border-radius: 9999px;
+    padding: 0.35rem 0.9rem;
+    backdrop-filter: blur(6px);
+  }
+  .chip .label {
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-right: 0.35rem;
+  }
+  .chip .value {
+    font-weight: 800;
+    font-size: 1rem;
+  }
+</style>

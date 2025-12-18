@@ -28,6 +28,12 @@ interface ContributionCalendar {
   weeks: ContributionWeek[];
 }
 
+interface RepoSearchResponse {
+  search: {
+    repositoryCount: number;
+  };
+}
+
 interface RepositoryNode {
   name: string;
   url: string;
@@ -91,11 +97,18 @@ interface Viewer {
   avatarUrl: string;
   followers: { totalCount: number };
   following: { totalCount: number };
+  issueComments: { totalCount: number };
   contributionsCollection: ContributionsCollection;
 }
 
 interface GitHubQueryResponse {
   viewer: Viewer;
+}
+
+interface RepoSearchResponse {
+  search: {
+    repositoryCount: number;
+  };
 }
 
 interface CommitHistory {
@@ -128,6 +141,9 @@ export interface GithubStats {
   totalPullRequestContributions: number;
   totalReviewContributions: number;
   totalIssueContributions: number;
+  reposCreatedThisYear: number;
+  issueCommentsCount: number;
+  reviewCommentsCount: number;
   contributionsByDay: {
     date: string;
     count: number;
@@ -228,6 +244,9 @@ export async function getGithubStats(
         following {
           totalCount
         }
+        issueComments(last: 1) {
+          totalCount
+        }
         contributionsCollection(from: $from, to: $to) {
           totalCommitContributions
           totalPullRequestContributions
@@ -306,6 +325,9 @@ export async function getGithubStats(
   let totalPullRequestContributions = collection.totalPullRequestContributions;
   let totalReviewContributions = collection.totalPullRequestReviewContributions;
   let totalIssueContributions = collection.totalIssueContributions;
+  const issueCommentsCount = viewer.issueComments.totalCount;
+  const reviewCommentsCount = collection.totalPullRequestReviewContributions;
+  let reposCreatedThisYear = 0;
 
   const authorId = viewer.id;
   const commitHoursUTC = Array.from<number>({ length: 24 }).fill(0);
@@ -380,6 +402,42 @@ export async function getGithubStats(
 
     totalReviewContributions = 0;
     totalIssueContributions = 0;
+  }
+
+  // Count repositories created in the given year for this user
+  try {
+    const searchQuery = `user:${viewer.login} fork:true created:${year}-01-01..${year}-12-31`;
+    const repoSearchQuery = `
+      query($query: String!) {
+        search(query: $query, type: REPOSITORY, first: 1) {
+          repositoryCount
+        }
+      }
+    `;
+    const repoSearchData = await fetchGraphQL<RepoSearchResponse>(token, repoSearchQuery, {
+      query: searchQuery
+    });
+    reposCreatedThisYear = repoSearchData.search.repositoryCount ?? 0;
+  } catch (e) {
+    console.error('Failed to fetch repos created this year', e);
+  }
+
+  // Count repositories created in the given year for this user
+  try {
+    const searchQuery = `user:${viewer.login} fork:true created:${year}-01-01..${year}-12-31`;
+    const repoSearchQuery = `
+      query($query: String!) {
+        search(query: $query, type: REPOSITORY, first: 1) {
+          repositoryCount
+        }
+      }
+    `;
+    const repoSearchData = await fetchGraphQL<RepoSearchResponse>(token, repoSearchQuery, {
+      query: searchQuery
+    });
+    reposCreatedThisYear = repoSearchData.search.repositoryCount ?? 0;
+  } catch (e) {
+    console.error('Failed to fetch repos created this year', e);
   }
 
   const contributionsByDay: GithubStats['contributionsByDay'] = [];
@@ -519,6 +577,9 @@ export async function getGithubStats(
     totalPullRequestContributions,
     totalReviewContributions,
     totalIssueContributions,
+    issueCommentsCount,
+    reviewCommentsCount,
+    reposCreatedThisYear,
     contributionsByDay,
     peakDay: peakDayStats,
     commitHoursUTC,
