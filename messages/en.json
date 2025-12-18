@@ -29,7 +29,7 @@
   "quote_200": "The world runs on code, and you're part of the engine. Keep pushing boundaries.",
   "quote_500": "Creativity meets logic. You're turning ideas into reality, one commit at a time.",
   "quote_1000": "Passion fuels progress. Your dedication to the craft is inspiring.",
-  "quote_max": "The limit is your imagination. Continue to innovate and shape the digital world.",
+  "quote_max": "The limit is your imagination. Continue to innovate and shape the world.",
   "common_close": "Close",
   "settings_show_green_wall_desc": "Show GitHub contribution calendar on the intro slide.",
   "settings_language_count_desc": "Number of languages to show in badges and pie chart.",
@@ -75,5 +75,15 @@
   "home_banner_desc": "Want more diverse data or custom slide cards? Star our repository",
   "slide_late_night_title": "Night Owl",
   "slide_late_night_desc": "You made {count} commits between 23:00 and 06:00. The stars are watching!",
-  "summary_new_year_motto": "In the new year, stay passionate and keep delivering."
+  "summary_new_year_motto": "Stay curious, keep making cool things.",
+  "summary_year_in_review": "Year in review",
+  "summary_title": "Keep the spark, keep growing",
+  "summary_subtitle": "Explore, create, and let your ideas land.",
+  "common_followers": "Followers",
+  "common_following": "Following",
+  "intro_new_repos": "New repos this year",
+  "community_title": "Community Pulse",
+  "community_desc": "Your footprints in conversations this year.",
+  "community_issue_comments": "Issue comments",
+  "community_review_comments": "Review comments"
 }
