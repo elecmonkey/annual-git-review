@@ -89,6 +89,8 @@ interface Viewer {
   login: string;
   name: string | null;
   avatarUrl: string;
+  followers: { totalCount: number };
+  following: { totalCount: number };
   contributionsCollection: ContributionsCollection;
 }
 
@@ -118,6 +120,8 @@ export interface GithubStats {
     login: string;
     avatarUrl: string;
     name: string;
+    followers: number;
+    following: number;
   };
   year: number;
   totalCommitContributions: number;
@@ -218,6 +222,12 @@ export async function getGithubStats(
         login
         name
         avatarUrl
+        followers {
+          totalCount
+        }
+        following {
+          totalCount
+        }
         contributionsCollection(from: $from, to: $to) {
           totalCommitContributions
           totalPullRequestContributions
@@ -500,7 +510,9 @@ export async function getGithubStats(
     user: {
       login: viewer.login,
       avatarUrl: viewer.avatarUrl,
-      name: viewer.name || viewer.login
+      name: viewer.name || viewer.login,
+      followers: viewer.followers.totalCount,
+      following: viewer.following.totalCount
     },
     year,
     totalCommitContributions,
