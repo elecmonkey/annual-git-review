@@ -4,8 +4,8 @@
   "activity_peak_contributions": "次贡献",
   "activity_peak_most_active_in": "最活跃于",
   "activity_peak_question": "这个仓库是否令你印象深刻？",
-  "common_commits": "提交",
-  "common_pull_requests": "PR",
+  "common_commits": "Commits",
+  "common_pull_requests": "Pull Requests",
   "intro_hi": "你好, @{name}",
   "intro_journey": "你的 {year} GitHub 之旅",
   "summary_keep_coding": "Keep Coding!",
@@ -78,6 +78,7 @@
   "summary_year_in_review": "Year in review",
   "summary_title": "点燃心火，向光而行",
   "summary_subtitle": "去探索，去创造，让心意落地。",
-  "common_followers": "关注者",
-  "common_following": "正在关注"
+  "common_followers": "Followers",
+  "common_following": "Following",
+  "summary_new_year_motto": "愿你在新的一年里，保持好奇、自在创作。"
 }

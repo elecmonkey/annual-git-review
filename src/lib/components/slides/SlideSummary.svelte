@@ -48,7 +48,7 @@
 </script>
 
 <div class="summary-container">
-  <div class="relative z-30 space-y-5 text-center">
+  <div class="relative z-30 space-y-4 text-center">
     <div class="avatar-row">
       <img
         src={stats.user.avatarUrl}
@@ -62,7 +62,7 @@
     </div>
 
     <div class="pill text-xs uppercase tracking-[0.35em] {theme.current.textMuted} mx-auto w-fit">
-      {m.summary_year_in_review()}
+      {stats.year} · {m.summary_year_in_review()}
     </div>
 
     <h2
@@ -72,7 +72,7 @@
       {m.summary_title()}
     </h2>
 
-    <p class="text-base font-medium {theme.current.textMuted}">
+    <p class="text-base font-medium mt-1 {theme.current.textMuted}">
       {m.summary_subtitle()}
     </p>
 
@@ -85,7 +85,7 @@
       {/each}
     </div>
 
-    <div class="stat-row subtle">
+    <div class="stat-row subtle mt-3">
       {#each socialStats as stat}
         <div class="stat-chip {theme.current.cardBg} {theme.current.border}">
           <span class="label {theme.current.textMuted}">{stat.label}</span>
