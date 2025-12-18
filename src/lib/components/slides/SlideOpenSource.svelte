@@ -10,7 +10,12 @@
   let topOSS = $derived(stats.openSourceStats.projectStats.slice(0, settings.ossCount));
 </script>
 
-<h3 class="mb-6 text-2xl font-bold">{m.oss_title()}</h3>
+<div class="mb-6 flex items-center gap-3 text-left">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 {theme.current.textPrimary}" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12.001 2c5.523 0 10 4.477 10 10c0 4.13-2.504 7.676-6.077 9.201l-2.518-6.55A3 3 0 0 0 12 9a3 3 0 0 0-1.404 5.652l-2.518 6.55A10 10 0 0 1 2 12C2 6.477 6.477 2 12 2"/>
+  </svg>
+  <h3 class="text-2xl font-bold">{m.oss_title()}</h3>
+</div>
 
 <div class="mb-8 grid w-full grid-cols-2 gap-4">
   <div class="rounded-xl {theme.current.cardBg} p-4 backdrop-blur-md">
