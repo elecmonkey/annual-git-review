@@ -51,6 +51,9 @@
       <div class="mt-3 text-3xl font-black {theme.current.textPrimary}">
         {formatValue(stats.issueCommentsCount)}
       </div>
+      <div class="mt-1 font-mono text-lg font-semibold text-green-400">
+        ++++++++++++++++++++++++++++++++++
+      </div>
     </div>
 
     <div class="px-1 py-1">
@@ -62,6 +65,12 @@
       </div>
       <div class="mt-3 text-3xl font-black {theme.current.textPrimary}">
         {formatValue(stats.reviewCommentsCount)}
+      </div>
+      <div class="mt-1 font-mono text-lg font-semibold text-green-400">
+        ++++++++++++++++++++++++++++++++++
+      </div>
+      <div class="-mt-2 font-mono text-lg font-semibold text-red-400">
+        ----------------------------------
       </div>
     </div>
   </div>
