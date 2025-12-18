@@ -51,7 +51,7 @@
       stats.totalReviewContributions +
       stats.totalIssueContributions}
   </div>
-  <p class="text-sm tracking-widest text-center leading-[1.05] {theme.current.textMuted} uppercase">
+  <p class="text-center text-sm leading-[1.05] tracking-widest {theme.current.textMuted} uppercase">
     {m.intro_total_contributions()}
   </p>
   <div class="flex flex-wrap items-center justify-center gap-2">
@@ -70,7 +70,7 @@
       class="grid w-full grid-flow-col grid-rows-7 gap-px"
       style="grid-template-columns: repeat(53, minmax(0, 1fr));"
     >
-      {#each contributionData as day}
+      {#each contributionData as day, idx (idx)}
         {#if day}
           <div
             class="aspect-square w-full rounded-[1px] {getLevelColor(day.level)}"

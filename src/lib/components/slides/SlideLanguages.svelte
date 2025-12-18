@@ -96,7 +96,7 @@
     if (['perl'].some((k) => l.includes(k))) {
       return "There's more than one way to do it, and you know them all.";
     }
-    if (['r'].some((k) => l === 'r')) {
+    if (l === 'r') {
       return 'Statistics and visualization. You find truth in data.';
     }
     if (['julia'].some((k) => l.includes(k))) {
@@ -140,7 +140,7 @@
           label: {
             show: true,
             position: 'outside',
-            formatter: (params: any) => {
+            formatter: (params: { dataIndex: number; name: string }) => {
               // Only show label if it's within the top N languages
               return params.dataIndex < settings.languageCount ? params.name : '';
             },
@@ -177,19 +177,21 @@
 <div class="relative mb-6 h-64 w-full">
   {#if primaryIcon}
     <div
-      class="pointer-events-none absolute -left-5 -top-30 z-0 {theme.current.textPrimary}"
-      style="opacity: 0.05; width: 180px; height: 180px;"
+      class="pointer-events-none absolute -top-30 -left-5 z-0 {theme.current.textPrimary}"
+      style="opacity: 0.1; width: 180px; height: 180px;"
       aria-hidden="true"
     >
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html getLargeIcon(primaryIcon)}
     </div>
   {/if}
   {#if secondaryIcon}
     <div
-      class="pointer-events-none absolute -right-5 -top-30 z-0 {theme.current.textPrimary}"
-      style="opacity: 0.05; width: 180px; height: 180px;"
+      class="pointer-events-none absolute -top-30 -right-5 z-0 {theme.current.textPrimary}"
+      style="opacity: 0.1; width: 180px; height: 180px;"
       aria-hidden="true"
     >
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html getLargeIcon(secondaryIcon)}
     </div>
   {/if}
@@ -198,7 +200,7 @@
   </div>
 </div>
 <div class="flex flex-wrap justify-center gap-2">
-  {#each stats.topLanguages.slice(0, settings.languageCount) as lang}
+  {#each stats.topLanguages.slice(0, settings.languageCount) as lang (lang.name)}
     {#if getLanguageIcon(lang.name)}
       <span
         class="inline-flex items-center gap-1.5 rounded-full border {theme.current.border} {theme
@@ -206,6 +208,7 @@
         style="color: {lang.color}"
       >
         <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -->
           {@html getLanguageIcon(lang.name) || ''}
         </span>
         {lang.name}

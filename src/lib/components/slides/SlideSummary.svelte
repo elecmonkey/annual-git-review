@@ -2,7 +2,6 @@
   import type { GithubStats } from '$lib/server/github';
   import { theme } from '$lib/theme.svelte';
   import * as m from '$lib/paraglide/messages';
-  import { getLanguage } from '$lib/i18n.svelte';
 
   let { stats } = $props<{ stats: GithubStats }>();
 
@@ -61,23 +60,23 @@
       </div>
     </div>
 
-    <div class="pill text-xs uppercase tracking-[0.35em] {theme.current.textMuted} mx-auto w-fit">
+    <div class="pill text-xs tracking-[0.35em] uppercase {theme.current.textMuted} mx-auto w-fit">
       {stats.year} · {m.summary_year_in_review()}
     </div>
 
     <h2
-      class="text-4xl font-black leading-tight title-gradient"
+      class="title-gradient text-4xl leading-tight font-black"
       style={`background-image: ${titleGradient};`}
     >
       {m.summary_title()}
     </h2>
 
-    <p class="text-base font-medium mt-1 {theme.current.textMuted}">
+    <p class="mt-1 text-base font-medium {theme.current.textMuted}">
       {m.summary_subtitle()}
     </p>
 
     <div class="stat-row">
-          {#each highlightStats as stat}
+      {#each highlightStats as stat (stat.label)}
         <div class="stat-chip {theme.current.cardBg} {theme.current.border}">
           <span class="label {theme.current.textMuted}">{stat.label}</span>
           <span class="value {theme.current.textPrimary}">{formatValue(stat.value)}</span>
@@ -86,7 +85,7 @@
     </div>
 
     <div class="stat-row subtle mt-3">
-      {#each socialStats as stat}
+      {#each socialStats as stat (stat.label)}
         <div class="stat-chip {theme.current.cardBg} {theme.current.border}">
           <span class="label {theme.current.textMuted}">{stat.label}</span>
           <span class="value {theme.current.textPrimary}">{formatValue(stat.value)}</span>

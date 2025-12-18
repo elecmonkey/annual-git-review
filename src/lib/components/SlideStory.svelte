@@ -231,7 +231,7 @@
 
   <!-- Progress Bar (Moved Outside) -->
   <div class="mt-6 flex w-full max-w-md gap-2 px-4">
-    {#each Array(totalSlides) as _, i}
+    {#each Array.from({ length: totalSlides }, (_, i) => i) as i (i)}
       <div class="h-1 flex-1 overflow-hidden rounded-full bg-white/20">
         <div
           class="h-full bg-white transition-all duration-300 ease-out"

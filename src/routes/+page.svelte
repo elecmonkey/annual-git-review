@@ -1,4 +1,5 @@
 <script lang="ts">
+  /* eslint-disable svelte/no-navigation-without-resolve */
   import Chart from '$lib/components/Chart.svelte';
   import GithubIcon from '$lib/components/GitHubIcon.svelte';
   import SlideStory from '$lib/components/SlideStory.svelte';
@@ -8,7 +9,6 @@
   import {
     Loader2,
     Github,
-    Calendar,
     Code,
     GitCommit,
     GitPullRequest,
@@ -445,7 +445,7 @@
                 {m.home_top_projects()}
               </h4>
               <div class="space-y-3">
-                {#each stats.openSourceStats.projectStats.slice(0, 5) as project}
+                {#each stats.openSourceStats.projectStats.slice(0, 5) as project (project.url)}
                   <div class="flex items-center justify-between rounded-lg bg-white p-3 shadow-sm">
                     <div class="flex items-center gap-3">
                       <img
@@ -587,6 +587,7 @@
                 class="w-full rounded-lg border border-gray-300 px-4 py-2 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-black"
               />
               <p class="mt-1 text-xs text-gray-500">
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 {@html m.home_token_help()}
               </p>
             </div>
