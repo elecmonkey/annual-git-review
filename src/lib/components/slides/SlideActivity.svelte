@@ -19,7 +19,7 @@
   <div
     class="rounded-2xl {theme.current.cardBg} border p-8 backdrop-blur-md {theme.current.border}"
   >
-    <div class="flex items-baseline gap-3">
+    <div class="flex items-baseline justify-center gap-3">
       <span
         class="text-7xl font-black {theme.current.accentGradient} bg-clip-text text-transparent"
       >
@@ -30,7 +30,7 @@
       >
     </div>
 
-    <div class="mt-4 text-2xl font-medium {theme.current.textSecondary}">
+    <div class="mt-4 text-2xl font-medium text-center {theme.current.textSecondary}">
       {new Date(stats.peakDay.date).toLocaleDateString(getLanguage(), {
         month: 'long',
         day: 'numeric'

@@ -38,23 +38,17 @@
           >
             <!-- Preview Circle -->
             <div class="h-10 w-10 overflow-hidden rounded-full shadow-lg {t.background} relative">
-              <div
-                class="absolute top-0 left-0 h-full w-full opacity-50 {t.decorBlob1} -translate-x-1/4 -translate-y-1/4 scale-50 blur-md"
-              ></div>
+               <div class="absolute top-0 left-0 w-full h-full opacity-50 {t.decorBlob1} blur-md scale-50 -translate-x-1/4 -translate-y-1/4"></div>
             </div>
 
             <div class="flex-1">
-              <div
-                class="font-bold {theme.current.id === t.id ? 'text-emerald-400' : 'text-white'}"
-              >
+              <div class="font-bold {theme.current.id === t.id ? 'text-emerald-400' : 'text-white'}">
                 {t.name}
               </div>
             </div>
 
             {#if theme.current.id === t.id}
-              <div
-                class="h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-              ></div>
+              <div class="h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
             {/if}
           </button>
         {/each}

@@ -51,7 +51,7 @@
       stats.totalReviewContributions +
       stats.totalIssueContributions}
   </div>
-  <p class="text-sm tracking-widest {theme.current.textMuted} uppercase">
+  <p class="text-sm tracking-widest text-center leading-[1.05] {theme.current.textMuted} uppercase">
     {m.intro_total_contributions()}
   </p>
   <div class="flex flex-wrap items-center justify-center gap-2">
@@ -90,16 +90,20 @@
     border-radius: 9999px;
     padding: 0.35rem 0.9rem;
     backdrop-filter: blur(6px);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    line-height: 1.05;
   }
   .chip .label {
     font-size: 0.75rem;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    display: inline-block;
-    margin-right: 0.35rem;
+    line-height: 1.05;
   }
   .chip .value {
     font-weight: 800;
     font-size: 1rem;
+    line-height: 1.05;
   }
 </style>
