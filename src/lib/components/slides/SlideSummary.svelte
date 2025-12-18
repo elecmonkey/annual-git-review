@@ -30,24 +30,29 @@
     { label: m.common_following(), value: stats.user.following }
   ]);
 
-  const titleGradient = $derived(() => {
+  const titleColorClass = $derived(
+    () => `${theme.current.textPrimary || 'text-white'}`
+  );
+  const titleGlow = $derived(() => {
     switch (theme.current.id) {
       case 'cyberpunk':
-        return 'linear-gradient(135deg, #fde047, #f472b6)';
+        return 'shadow-[0_0_30px_rgba(255,255,255,0.35),0_0_60px_rgba(250,204,21,0.35)]';
       case 'forest':
-        return 'linear-gradient(135deg, #bef264, #fbbf24)';
+        return 'shadow-[0_0_30px_rgba(190,242,100,0.35),0_0_60px_rgba(74,222,128,0.35)]';
       case 'sunset':
-        return 'linear-gradient(135deg, #f97316, #fb7185)';
+        return 'shadow-[0_0_30px_rgba(251,113,133,0.35),0_0_60px_rgba(249,115,22,0.35)]';
       case 'ocean':
-        return 'linear-gradient(135deg, #22d3ee, #60a5fa)';
+        return 'shadow-[0_0_30px_rgba(96,165,250,0.35),0_0_60px_rgba(34,211,238,0.35)]';
       default:
-        return 'linear-gradient(135deg, #a5f3fc, #86efac)';
+        return 'shadow-[0_0_30px_rgba(255,255,255,0.25),0_0_60px_rgba(255,255,255,0.15)]';
     }
   });
 </script>
 
 <div class="summary-container">
-  <div class="relative z-30 space-y-4 text-center">
+  <div
+    class="relative z-30 flex h-full w-full flex-col items-center justify-center gap-4 text-center"
+  >
     <div class="avatar-row">
       <img
         src={stats.user.avatarUrl}
@@ -65,17 +70,18 @@
     </div>
 
     <h2
-      class="title-gradient text-4xl leading-tight font-black"
-      style={`background-image: ${titleGradient};`}
+      class="pt-10 pb-10 title-glow text-4xl leading-tight font-semibold {titleGlow} text-center"
+      style="color: rgba(255,255,255,0.7);"
     >
-      {m.summary_title()}
+      <span class="block">Keep the spark</span>
+      <span class="block">keep growing</span>
     </h2>
 
-    <p class="mt-1 text-base font-medium {theme.current.textMuted}">
+    <p class="mt-2 text-base font-medium {theme.current.textMuted}">
       {m.summary_subtitle()}
     </p>
 
-    <div class="stat-row">
+    <div class="stat-row mt-2">
       {#each highlightStats as stat (stat.label)}
         <div class="stat-chip {theme.current.cardBg} {theme.current.border}">
           <span class="label {theme.current.textMuted}">{stat.label}</span>
@@ -84,7 +90,7 @@
       {/each}
     </div>
 
-    <div class="stat-row subtle mt-3">
+    <div class="stat-row subtle mt-1">
       {#each socialStats as stat (stat.label)}
         <div class="stat-chip {theme.current.cardBg} {theme.current.border}">
           <span class="label {theme.current.textMuted}">{stat.label}</span>
@@ -93,14 +99,11 @@
       {/each}
     </div>
 
-    <p class="quote text-lg font-semibold {theme.current.textSecondary}">
-      {getQuote(stats.totalCommitContributions)}
-    </p>
   </div>
 </div>
 
 <style>
-  .summary-container {
+.summary-container {
     position: relative;
     height: 100%;
     width: 100%;
@@ -152,11 +155,10 @@
     max-width: 24rem;
     margin: 0 auto;
   }
-  .title-gradient {
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  .title-glow {
+    display: inline-block;
+    letter-spacing: -0.01em;
+    text-shadow: 0 0 18px rgba(255, 255, 255, 0.9), 0 0 36px rgba(255, 255, 255, 0.4);
   }
   .avatar-row {
     display: flex;
