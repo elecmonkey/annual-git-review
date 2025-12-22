@@ -11,6 +11,7 @@ export const POST: RequestHandler = async ({ request }) => {
   const includePrivate = data.includePrivate;
   const ossMinStars = parseInt(data.ossMinStars || '0');
   const ossIncludeOwn = data.ossIncludeOwn;
+  const includeForkRepos = data.includeForkRepos ?? false;
 
   if (!token) {
     return json({ missing: true, message: 'GitHub Token is required' }, { status: 400 });
@@ -19,7 +20,7 @@ export const POST: RequestHandler = async ({ request }) => {
   const year = yearStr ? parseInt(yearStr) : new Date().getFullYear();
 
   try {
-    const stats = await getGithubStats(token, year, includePrivate, ossMinStars, ossIncludeOwn);
+    const stats = await getGithubStats(token, year, includePrivate, ossMinStars, ossIncludeOwn, includeForkRepos);
     return json({ success: true, stats });
   } catch (err) {
     console.error(err);

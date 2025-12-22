@@ -41,6 +41,7 @@ interface RepositoryNode {
     login: string;
   };
   isPrivate: boolean;
+  isFork: boolean;
   primaryLanguage: {
     name: string;
     color: string;
@@ -111,14 +112,60 @@ interface RepoSearchResponse {
   };
 }
 
+interface ForkRepositoryNode {
+  name: string;
+  url: string;
+  owner: {
+    login: string;
+  };
+  isPrivate: boolean;
+  primaryLanguage: {
+    name: string;
+    color: string;
+  } | null;
+}
+
+interface ForkRepositoriesResponse {
+  viewer: {
+    repositories: {
+      pageInfo: {
+        hasNextPage: boolean;
+        endCursor: string | null;
+      };
+      nodes: ForkRepositoryNode[];
+    };
+  };
+}
+
 interface CommitHistory {
   pageInfo: { hasNextPage: boolean; endCursor: string | null };
-  nodes: { committedDate: string }[];
+  nodes: { committedDate: string; oid?: string }[];
 }
 
 interface RepoHistoryResponse {
   repository?: {
     defaultBranchRef?: {
+      target?: {
+        history?: CommitHistory;
+      };
+    };
+  };
+}
+
+interface BranchRefsResponse {
+  repository?: {
+    refs?: {
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
+      nodes: {
+        name: string;
+      }[];
+    };
+  };
+}
+
+interface BranchHistoryResponse {
+  repository?: {
+    ref?: {
       target?: {
         history?: CommitHistory;
       };
@@ -227,7 +274,8 @@ export async function getGithubStats(
   year: number,
   includePrivate = true,
   ossMinStars = 0,
-  ossIncludeOwn = true
+  ossIncludeOwn = true,
+  includeForkRepos = false
 ): Promise<GithubStats> {
   const from = `${year}-01-01T00:00:00Z`;
   const to = `${year}-12-31T23:59:59Z`;
@@ -272,6 +320,7 @@ export async function getGithubStats(
                 login
               }
               isPrivate
+              isFork
               primaryLanguage {
                 name
                 color
@@ -422,22 +471,307 @@ export async function getGithubStats(
     console.error('Failed to fetch repos created this year', e);
   }
 
-  // Count repositories created in the given year for this user
-  try {
-    const searchQuery = `user:${viewer.login} fork:true created:${year}-01-01..${year}-12-31`;
-    const repoSearchQuery = `
-      query($query: String!) {
-        search(query: $query, type: REPOSITORY, first: 1) {
-          repositoryCount
+  // Query fork repositories and count their commits (only if includeForkRepos is true)
+  const forkReposMap = new Map<
+    string,
+    {
+      name: string;
+      owner: string;
+      commits: number;
+      language: string | null;
+      languageColor: string | null;
+      isPrivate: boolean;
+      url: string;
+    }
+  >();
+
+  if (includeForkRepos) {
+    try {
+      // console.log(`Starting fork repositories query for year ${year}...`);
+      const forkReposQuery = `
+        query($after: String) {
+          viewer {
+            repositories(
+              first: 100
+              after: $after
+              isFork: true
+              affiliations: [OWNER]
+              orderBy: {field: UPDATED_AT, direction: DESC}
+            ) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+              nodes {
+                name
+                url
+                owner {
+                  login
+                }
+                isPrivate
+                primaryLanguage {
+                  name
+                  color
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      let forkAfter: string | undefined = undefined;
+      let totalForkReposFound = 0;
+      while (true) {
+        const forkData: ForkRepositoriesResponse = await fetchGraphQL<ForkRepositoriesResponse>(
+          token,
+          forkReposQuery,
+          {
+            after: forkAfter
+          }
+        );
+
+        const forkRepos = forkData.viewer.repositories.nodes;
+        totalForkReposFound += forkRepos.length;
+        // console.log(`Found ${forkRepos.length} fork repositories owned by ${viewer.login} in this batch (total: ${totalForkReposFound})`);
+        
+        // Query to get all branches of a repo
+        const branchRefsQuery = `
+          query($owner: String!, $name: String!, $after: String) {
+            repository(owner: $owner, name: $name) {
+              refs(refPrefix: "refs/heads/", first: 100, after: $after) {
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                }
+                nodes {
+                  name
+                }
+              }
+            }
+          }
+        `;
+
+        // Query to get commits on a specific branch
+        const branchHistoryQuery = `
+          query($owner: String!, $name: String!, $branch: String!, $authorId: ID!, $from: GitTimestamp!, $to: GitTimestamp!, $after: String) {
+            repository(owner: $owner, name: $name) {
+              ref(qualifiedName: $branch) {
+                target {
+                  ... on Commit {
+                    history(first: 100, author: {id: $authorId}, since: $from, until: $to, after: $after) {
+                      pageInfo { hasNextPage endCursor }
+                      nodes { 
+                        oid
+                        committedDate 
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `;
+
+        for (const forkRepo of forkRepos) {
+          // Skip private repos if includePrivate is false
+          if (!includePrivate && forkRepo.isPrivate) {
+            // console.log(`Skipping private fork repo ${forkRepo.owner.login}/${forkRepo.name}`);
+            continue;
+          }
+
+          const owner = forkRepo.owner.login;
+          const name = forkRepo.name;
+          
+          // console.log(`Checking fork repo ${owner}/${name} for commits in ${year} (all branches)...`);
+
+          // Set to deduplicate commits by OID (same commit can exist on multiple branches)
+          const uniqueCommitOids = new Set<string>();
+          const commitDates: string[] = [];
+
+          try {
+            // Step 1: Get all branches
+            const branches: string[] = [];
+            let branchAfter: string | undefined = undefined;
+            
+            while (true) {
+              const branchData: BranchRefsResponse = await fetchGraphQL<BranchRefsResponse>(
+                token,
+                branchRefsQuery,
+                {
+                  owner,
+                  name,
+                  after: branchAfter
+                }
+              );
+
+              const refs = branchData.repository?.refs;
+              if (!refs || refs.nodes.length === 0) break;
+
+              for (const ref of refs.nodes) {
+                branches.push(ref.name);
+              }
+
+              if (refs.pageInfo.hasNextPage && refs.pageInfo.endCursor) {
+                branchAfter = refs.pageInfo.endCursor || undefined;
+              } else {
+                break;
+              }
+            }
+
+            if (branches.length === 0) {
+              // console.log(`  -> No branches found for ${owner}/${name}`);
+              continue;
+            }
+
+            // Find default branch name (usually main or master)
+            const defaultBranches = ['main', 'master'];
+            const defaultBranch = branches.find(b => defaultBranches.includes(b));
+            
+            // Step 2: First, collect commits from default branch to exclude them
+            // These are likely synced from upstream (squash merged PRs)
+            const defaultBranchCommits = new Set<string>();
+            
+            if (defaultBranch) {
+              // console.log(`  -> Found ${branches.length} branches (default: ${defaultBranch}), scanning...`);
+              let histAfter: string | undefined = undefined;
+              
+              while (true) {
+                const histData = await fetchGraphQL<BranchHistoryResponse>(token, branchHistoryQuery, {
+                  owner,
+                  name,
+                  branch: `refs/heads/${defaultBranch}`,
+                  authorId,
+                  from,
+                  to,
+                  after: histAfter
+                });
+
+                const ref = histData.repository?.ref;
+                const target = ref?.target as { history?: CommitHistory } | undefined;
+                const history = target?.history ?? null;
+                if (!history || history.nodes.length === 0) break;
+
+                for (const node of history.nodes) {
+                  if (node.oid) {
+                    defaultBranchCommits.add(node.oid);
+                  }
+                }
+
+                if (history.pageInfo.hasNextPage && history.pageInfo.endCursor) {
+                  histAfter = history.pageInfo.endCursor || undefined;
+                } else {
+                  break;
+                }
+              }
+              
+              if (defaultBranchCommits.size > 0) {
+                // console.log(`     [${defaultBranch}] Found ${defaultBranchCommits.size} commits (excluded - likely synced from upstream)`);
+              }
+            } else {
+              // console.log(`  -> Found ${branches.length} branches (no default branch found), scanning...`);
+            }
+
+            // Step 3: Query commits on feature branches (excluding default branch commits)
+            for (const branch of branches) {
+              // Skip default branch - already processed
+              if (defaultBranches.includes(branch)) continue;
+              
+              let histAfter: string | undefined = undefined;
+              let branchCommitCount = 0;
+              let newCommitsOnBranch = 0;
+              let excludedFromDefault = 0;
+              
+              while (true) {
+                const histData = await fetchGraphQL<BranchHistoryResponse>(token, branchHistoryQuery, {
+                  owner,
+                  name,
+                  branch: `refs/heads/${branch}`,
+                  authorId,
+                  from,
+                  to,
+                  after: histAfter
+                });
+
+                const ref = histData.repository?.ref;
+                const target = ref?.target as { history?: CommitHistory } | undefined;
+                const history = target?.history ?? null;
+                if (!history || history.nodes.length === 0) break;
+
+                branchCommitCount += history.nodes.length;
+
+                for (const node of history.nodes) {
+                  if (!node.oid) continue;
+                  
+                  // Skip commits that exist on default branch (synced from upstream)
+                  if (defaultBranchCommits.has(node.oid)) {
+                    excludedFromDefault++;
+                    continue;
+                  }
+                  
+                  // Deduplicate by commit OID
+                  if (!uniqueCommitOids.has(node.oid)) {
+                    uniqueCommitOids.add(node.oid);
+                    commitDates.push(node.committedDate);
+                    newCommitsOnBranch++;
+                    // Log each unique commit found
+                    const shortOid = node.oid.substring(0, 7);
+                    const date = new Date(node.committedDate).toISOString().split('T')[0];
+                    // console.log(`     [${branch}] Found commit ${shortOid} (${date})`);
+                  }
+                }
+
+                if (history.pageInfo.hasNextPage && history.pageInfo.endCursor) {
+                  histAfter = history.pageInfo.endCursor || undefined;
+                } else {
+                  break;
+                }
+              }
+
+              if (branchCommitCount > 0) {
+                const deduped = branchCommitCount - newCommitsOnBranch - excludedFromDefault;
+                if (excludedFromDefault > 0 || deduped > 0) {
+                  // console.log(`     [${branch}] ${branchCommitCount} total, ${excludedFromDefault} from default branch excluded, ${deduped} deduped`);
+                }
+              }
+            }
+
+            // Count commit hours from unique commits
+            for (const dateStr of commitDates) {
+              const d = new Date(dateStr);
+              const h = d.getUTCHours();
+              commitHoursUTC[h]++;
+            }
+
+            const commitCount = uniqueCommitOids.size;
+            if (commitCount > 0) {
+              forkReposMap.set(forkRepo.url, {
+                name: forkRepo.name,
+                owner: forkRepo.owner.login,
+                commits: commitCount,
+                language: forkRepo.primaryLanguage?.name ?? null,
+                languageColor: forkRepo.primaryLanguage?.color ?? null,
+                isPrivate: forkRepo.isPrivate,
+                url: forkRepo.url
+              });
+              // console.log(`  -> Added with ${commitCount} unique commits across ${branches.length} branches`);
+            } else {
+              // console.log(`  -> No commits by you in ${year} on any branch`);
+            }
+          } catch (err) {
+            // console.warn(`Failed to fetch commits for fork repo ${owner}/${name}:`, err);
+          }
+        }
+
+        if (forkData.viewer.repositories.pageInfo.hasNextPage && forkData.viewer.repositories.pageInfo.endCursor) {
+          forkAfter = forkData.viewer.repositories.pageInfo.endCursor || undefined;
+        } else {
+          break;
         }
       }
-    `;
-    const repoSearchData = await fetchGraphQL<RepoSearchResponse>(token, repoSearchQuery, {
-      query: searchQuery
-    });
-    reposCreatedThisYear = repoSearchData.search.repositoryCount ?? 0;
+      // console.log(`Fork repositories query complete. Found ${forkReposMap.size} fork repos with commits.`);
   } catch (e) {
-    console.error('Failed to fetch repos created this year', e);
+      // console.error('Failed to fetch fork repositories', e);
+    }
   }
 
   const contributionsByDay: GithubStats['contributionsByDay'] = [];
@@ -466,12 +800,37 @@ export async function getGithubStats(
       languageColor: node.repository.primaryLanguage?.color ?? null,
       isPrivate: node.repository.isPrivate,
       url: node.repository.url
-    }))
-    .sort((a, b) => b.commits - a.commits);
+    }));
+
+  // Merge fork repositories into topRepositories
+  let newForkCommitsTotal = 0;
+  for (const forkRepo of forkReposMap.values()) {
+    const existingIndex = topRepositories.findIndex(
+      (repo) => repo.name === forkRepo.name && repo.owner === forkRepo.owner
+    );
+    if (existingIndex >= 0) {
+      // If fork repo already exists (from commitContributionsByRepository), add commits
+      // Note: Only count commits that weren't already counted by GitHub API
+      // GitHub API only counts commits merged via PR, so we add the fork's direct commits
+      topRepositories[existingIndex].commits += forkRepo.commits;
+      newForkCommitsTotal += forkRepo.commits;
+    } else {
+      // Add new fork repo (not in commitContributionsByRepository)
+      topRepositories.push(forkRepo);
+      newForkCommitsTotal += forkRepo.commits;
+    }
+  }
+
+  // Sort by commit count
+  topRepositories.sort((a, b) => b.commits - a.commits);
 
   if (!includePrivate) {
     topRepositories = topRepositories.filter((repo) => !repo.isPrivate);
   }
+
+  // Update totalCommitContributions to include fork repos
+  // Only add commits from fork repos that weren't already counted
+  totalCommitContributions += newForkCommitsTotal;
 
   const peakDayStats = {
     ...peakDay,
