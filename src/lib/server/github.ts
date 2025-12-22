@@ -761,7 +761,7 @@ export async function getGithubStats(
               // console.log(`  -> No commits by you in ${year} on any branch`);
             }
           } catch (err) {
-            // console.warn(`Failed to fetch commits for fork repo ${owner}/${name}:`, err);
+            console.warn(`Failed to fetch commits for fork repo ${owner}/${name}:`, err);
           }
         }
 
