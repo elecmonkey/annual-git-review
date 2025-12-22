@@ -763,7 +763,7 @@ export async function getGithubStats(
         }
 
         if (forkData.viewer.repositories.pageInfo.hasNextPage && forkData.viewer.repositories.pageInfo.endCursor) {
-          forkAfter = forkData.viewer.repositories.pageInfo.endCursor || undefined;
+          forkAfter = forkData.viewer.repositories.pageInfo.endCursor;
         } else {
           break;
         }
