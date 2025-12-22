@@ -773,7 +773,7 @@ export async function getGithubStats(
       }
       // console.log(`Fork repositories query complete. Found ${forkReposMap.size} fork repos with commits.`);
   } catch (e) {
-      // console.error('Failed to fetch fork repositories', e);
+      console.error('Failed to fetch fork repositories', e);
     }
   }
 
