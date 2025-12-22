@@ -31,6 +31,7 @@
   let includePrivate = $state(true);
   let ossMinStars = $state(0);
   let ossIncludeOwn = $state(true);
+  let includeForkRepos = $state(false);
   let showBanner = $state(true);
 
   // Initialize stats and token from localStorage or form data
@@ -62,6 +63,11 @@
     const cachedOssIncludeOwn = localStorage.getItem('oss_include_own');
     if (cachedOssIncludeOwn !== null) {
       ossIncludeOwn = cachedOssIncludeOwn === 'true';
+    }
+
+    const cachedIncludeForkRepos = localStorage.getItem('include_fork_repos');
+    if (cachedIncludeForkRepos !== null) {
+      includeForkRepos = cachedIncludeForkRepos === 'true';
     }
   });
 
@@ -540,6 +546,9 @@
               const ossIncludeOwnValue = formData.get('ossIncludeOwn') === 'on';
               localStorage.setItem('oss_include_own', String(ossIncludeOwnValue));
 
+              const includeForkReposValue = formData.get('includeForkRepos') === 'on';
+              localStorage.setItem('include_fork_repos', String(includeForkReposValue));
+
               try {
                 const res = await fetch('/api/generate', {
                   method: 'POST',
@@ -548,7 +557,8 @@
                     year: formData.get('year')?.toString(),
                     includePrivate: includePrivateValue,
                     ossMinStars: ossMinStarsValue,
-                    ossIncludeOwn: ossIncludeOwnValue
+                    ossIncludeOwn: ossIncludeOwnValue,
+                    includeForkRepos: includeForkReposValue
                   }),
                   headers: { 'Content-Type': 'application/json' }
                 });
@@ -615,6 +625,19 @@
               />
               <label for="includePrivate" class="text-sm font-medium text-gray-700">
                 {m.home_include_private()}
+              </label>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="includeForkRepos"
+                id="includeForkRepos"
+                bind:checked={includeForkRepos}
+                class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+              />
+              <label for="includeForkRepos" class="text-sm font-medium text-gray-700">
+                {m.home_include_fork_repos()}
               </label>
             </div>
 
