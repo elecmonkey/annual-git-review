@@ -612,7 +612,7 @@ export async function getGithubStats(
               }
 
               if (refs.pageInfo.hasNextPage && refs.pageInfo.endCursor) {
-                branchAfter = refs.pageInfo.endCursor || undefined;
+                branchAfter = refs.pageInfo.endCursor;
               } else {
                 break;
               }
