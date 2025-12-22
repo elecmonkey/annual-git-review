@@ -714,7 +714,6 @@ export async function getGithubStats(
                     commitDates.push(node.committedDate);
                     newCommitsOnBranch++;
                     // Log each unique commit found
-                    const shortOid = node.oid.substring(0, 7);
                     // console.log(`     [${branch}] Found commit ${shortOid} (${new Date(node.committedDate).toISOString().split('T')[0]})`);
                   }
                 }
