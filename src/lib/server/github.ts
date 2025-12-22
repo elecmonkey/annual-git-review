@@ -118,6 +118,15 @@ interface ForkRepositoryNode {
   owner: {
     login: string;
   };
+  parent?: {
+    name: string;
+    owner: {
+      login: string;
+    };
+    defaultBranchRef?: {
+      name: string;
+    } | null;
+  } | null;
   isPrivate: boolean;
   primaryLanguage: {
     name: string;
@@ -486,9 +495,18 @@ export async function getGithubStats(
   >();
 
   if (includeForkRepos) {
-    try {
-      // console.log(`Starting fork repositories query for year ${year}...`);
-      const forkReposQuery = `
+      // Create a set of already known repositories to avoid double counting
+      const existingRepoUrls = new Set(collection.commitContributionsByRepository.map(item => item.repository.url));
+
+      try {
+        // Fork repo scan rationale:
+        // - Scan all branches to capture work in feature branches that hasn't been merged or tracked by GitHub yet.
+        // - Filter by authorId to ensure we only count the user's own commits.
+        // - Deduplicate by commit OID to handle branches pointing to same commits or cherry-picks.
+        // - This avoids the "synced from upstream" issue by relying on authorId (we don't count others' commits).
+        // - Performance: This is API-heavy (N forks * M branches), so we limit concurrency or depth if needed.
+        // console.log(`Starting fork repositories query for year ${year}...`);
+        const forkReposQuery = `
         query($after: String) {
           viewer {
             repositories(
@@ -508,6 +526,15 @@ export async function getGithubStats(
                 owner {
                   login
                 }
+                parent {
+                  name
+                  owner {
+                    login
+                  }
+                  defaultBranchRef {
+                    name
+                  }
+                }
                 isPrivate
                 primaryLanguage {
                   name
@@ -520,7 +547,6 @@ export async function getGithubStats(
       `;
 
       let forkAfter: string | undefined = undefined;
-      let totalForkReposFound = 0;
       while (true) {
         const forkData: ForkRepositoriesResponse = await fetchGraphQL<ForkRepositoriesResponse>(
           token,
@@ -531,9 +557,8 @@ export async function getGithubStats(
         );
 
         const forkRepos = forkData.viewer.repositories.nodes;
-        totalForkReposFound += forkRepos.length;
-        // console.log(`Found ${forkRepos.length} fork repositories owned by ${viewer.login} in this batch (total: ${totalForkReposFound})`);
-        
+        // console.log(`Found ${forkRepos.length} fork repositories owned by ${viewer.login} in this batch`);
+
         // Query to get all branches of a repo
         const branchRefsQuery = `
           query($owner: String!, $name: String!, $after: String) {
@@ -560,9 +585,9 @@ export async function getGithubStats(
                   ... on Commit {
                     history(first: 100, author: {id: $authorId}, since: $from, until: $to, after: $after) {
                       pageInfo { hasNextPage endCursor }
-                      nodes { 
+                      nodes {
                         oid
-                        committedDate 
+                        committedDate
                       }
                     }
                   }
@@ -581,7 +606,7 @@ export async function getGithubStats(
 
           const owner = forkRepo.owner.login;
           const name = forkRepo.name;
-          
+
           // console.log(`Checking fork repo ${owner}/${name} for commits in ${year} (all branches)...`);
 
           // Set to deduplicate commits by OID (same commit can exist on multiple branches)
@@ -592,7 +617,7 @@ export async function getGithubStats(
             // Step 1: Get all branches
             const branches: string[] = [];
             let branchAfter: string | undefined = undefined;
-            
+
             while (true) {
               const branchData: BranchRefsResponse = await fetchGraphQL<BranchRefsResponse>(
                 token,
@@ -623,64 +648,19 @@ export async function getGithubStats(
               continue;
             }
 
-            // Find default branch name (usually main or master)
-            const defaultBranches = ['main', 'master'];
-            const defaultBranch = branches.find(b => defaultBranches.includes(b));
-            
-            // Step 2: First, collect commits from default branch to exclude them
-            // These are likely synced from upstream (squash merged PRs)
-            const defaultBranchCommits = new Set<string>();
-            
-            if (defaultBranch) {
-              // console.log(`  -> Found ${branches.length} branches (default: ${defaultBranch}), scanning...`);
-              let histAfter: string | undefined = undefined;
-              
-              while (true) {
-                const histData = await fetchGraphQL<BranchHistoryResponse>(token, branchHistoryQuery, {
-                  owner,
-                  name,
-                  branch: `refs/heads/${defaultBranch}`,
-                  authorId,
-                  from,
-                  to,
-                  after: histAfter
-                });
-
-                const ref = histData.repository?.ref;
-                const target = ref?.target as { history?: CommitHistory } | undefined;
-                const history = target?.history ?? null;
-                if (!history || history.nodes.length === 0) break;
-
-                for (const node of history.nodes) {
-                  if (node.oid) {
-                    defaultBranchCommits.add(node.oid);
-                  }
-                }
-
-                if (history.pageInfo.hasNextPage && history.pageInfo.endCursor) {
-                  histAfter = history.pageInfo.endCursor || undefined;
-                } else {
-                  break;
-                }
-              }
-              
-              if (defaultBranchCommits.size > 0) {
-                // console.log(`     [${defaultBranch}] Found ${defaultBranchCommits.size} commits (excluded - likely synced from upstream)`);
-              }
-            } else {
-              // console.log(`  -> Found ${branches.length} branches (no default branch found), scanning...`);
-            }
-
-            // Step 3: Query commits on feature branches (excluding default branch commits)
+            // Step 2: Query commits on all branches
+            // We do NOT explicitly exclude parent/upstream commits here.
+            // Instead, we rely on `authorId: $authorId` in the GraphQL query to only fetch
+            // commits authored by the current user. This automatically excludes commits
+            // synced from upstream that were authored by others.
+            // If the user authored a commit in upstream and synced it back, it is still
+            // their commit and valid to count (though potential double-counting with upstream
+            // repo stats is possible, we prioritize capturing fork activity here).
             for (const branch of branches) {
-              // Skip default branch - already processed
-              if (defaultBranches.includes(branch)) continue;
-              
               let histAfter: string | undefined = undefined;
               let branchCommitCount = 0;
               let newCommitsOnBranch = 0;
-              let excludedFromDefault = 0;
-              
+
               while (true) {
                 const histData = await fetchGraphQL<BranchHistoryResponse>(token, branchHistoryQuery, {
                   owner,
@@ -701,13 +681,7 @@ export async function getGithubStats(
 
                 for (const node of history.nodes) {
                   if (!node.oid) continue;
-                  
-                  // Skip commits that exist on default branch (synced from upstream)
-                  if (defaultBranchCommits.has(node.oid)) {
-                    excludedFromDefault++;
-                    continue;
-                  }
-                  
+
                   // Deduplicate by commit OID
                   if (!uniqueCommitOids.has(node.oid)) {
                     uniqueCommitOids.add(node.oid);
@@ -726,9 +700,9 @@ export async function getGithubStats(
               }
 
               if (branchCommitCount > 0) {
-                const deduped = branchCommitCount - newCommitsOnBranch - excludedFromDefault;
-                if (excludedFromDefault > 0 || deduped > 0) {
-                  // console.log(`     [${branch}] ${branchCommitCount} total, ${excludedFromDefault} from default branch excluded, ${deduped} deduped`);
+                const deduped = branchCommitCount - newCommitsOnBranch;
+                if (deduped > 0) {
+                  // console.log(`     [${branch}] ${branchCommitCount} total, ${deduped} deduped`);
                 }
               }
             }
@@ -737,7 +711,7 @@ export async function getGithubStats(
             // Avoid double-counting: if this fork repo is already represented
             // in commitContributionsByRepository, its commit hours will be
             // accounted for there.
-            if (!commitContributionsByRepository.has(forkRepo.url)) {
+            if (!existingRepoUrls.has(forkRepo.url)) {
               for (const dateStr of commitDates) {
                 const d = new Date(dateStr);
                 const h = d.getUTCHours();
@@ -812,11 +786,18 @@ export async function getGithubStats(
       (repo) => repo.name === forkRepo.name && repo.owner === forkRepo.owner
     );
     if (existingIndex >= 0) {
-      // If fork repo already exists (from commitContributionsByRepository), add commits
-      // Note: Only count commits that weren't already counted by GitHub API
-      // GitHub API only counts commits merged via PR, so we add the fork's direct commits
-      topRepositories[existingIndex].commits += forkRepo.commits;
-      newForkCommitsTotal += forkRepo.commits;
+      // If fork repo already exists (from commitContributionsByRepository), it means GitHub
+      // has already counted some commits (usually from default branch).
+      // Since our scan (forkReposMap) covers all branches and deduplicates, it represents
+      // the complete set of commits by the user in this repo.
+      // We should use the larger count (likely our scan) to avoid double counting while
+      // capturing all contributions.
+      const currentCommits = topRepositories[existingIndex].commits;
+      if (forkRepo.commits > currentCommits) {
+        const diff = forkRepo.commits - currentCommits;
+        topRepositories[existingIndex].commits = forkRepo.commits;
+        newForkCommitsTotal += diff;
+      }
     } else {
       // Add new fork repo (not in commitContributionsByRepository)
       topRepositories.push(forkRepo);
