@@ -734,10 +734,15 @@ export async function getGithubStats(
             }
 
             // Count commit hours from unique commits
-            for (const dateStr of commitDates) {
-              const d = new Date(dateStr);
-              const h = d.getUTCHours();
-              commitHoursUTC[h]++;
+            // Avoid double-counting: if this fork repo is already represented
+            // in commitContributionsByRepository, its commit hours will be
+            // accounted for there.
+            if (!commitContributionsByRepository.has(forkRepo.url)) {
+              for (const dateStr of commitDates) {
+                const d = new Date(dateStr);
+                const h = d.getUTCHours();
+                commitHoursUTC[h]++;
+              }
             }
 
             const commitCount = uniqueCommitOids.size;
